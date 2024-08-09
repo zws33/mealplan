@@ -5,6 +5,7 @@ export function buildMealPlans(
   mealCount: number,
   calorieLimit: number
 ): Meal[][] {
+  console.log(`availableMeals: ${JSON.stringify(availableMeals)}`);
   const mealPlans: Meal[][] = [];
   function backtrack(
     index: number,
