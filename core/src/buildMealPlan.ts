@@ -8,33 +8,27 @@ export function buildMealPlans(
   const mealPlans: Meal[][] = [];
   function backtrack(
     index: number,
-    currentMeals: Meal[],
     currentCalories: number,
-    calorieLimit: number,
-    mealCount: number
+    currentMeals: Meal[]
   ) {
     if (currentMeals.length === mealCount) {
       if (currentCalories <= calorieLimit) {
-        mealPlans.push(currentMeals.slice());
+        mealPlans.push([...currentMeals]);
+        return;
       }
+    }
+    if (index === availableMeals.length) {
       return;
     }
-    for (let i = index; i < availableMeals.length; i++) {
-      const meal = availableMeals[i];
-      if (currentCalories + meal.calories > calorieLimit) {
-        continue;
-      }
-      currentMeals.push(meal);
-      backtrack(
-        i + 1,
-        currentMeals,
-        currentCalories + meal.calories,
-        calorieLimit,
-        mealCount
-      );
+    const nextMeal = availableMeals[index];
+    if (currentCalories + nextMeal.calories < calorieLimit) {
+      currentMeals.push(nextMeal);
+      backtrack(index + 1, currentCalories + nextMeal.calories, currentMeals);
       currentMeals.pop();
     }
+
+    backtrack(index + 1, currentCalories, currentMeals);
   }
-  backtrack(0, [], 0, calorieLimit, mealCount);
+  backtrack(0, 0, []);
   return mealPlans;
 }
