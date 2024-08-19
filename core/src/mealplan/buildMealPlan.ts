@@ -5,7 +5,6 @@ export function buildMealPlans(
   mealCount: number,
   calorieLimit: number
 ): Meal[][] {
-  console.log(`availableMeals: ${JSON.stringify(availableMeals)}`);
   const mealPlans: Meal[][] = [];
   function backtrack(
     index: number,
@@ -26,9 +25,9 @@ export function buildMealPlans(
       currentMeals.push(nextMeal);
       backtrack(index + 1, currentCalories + nextMeal.calories, currentMeals);
       currentMeals.pop();
+    } else {
+      backtrack(index + 1, currentCalories, currentMeals);
     }
-
-    backtrack(index + 1, currentCalories, currentMeals);
   }
   backtrack(0, 0, []);
   return mealPlans;
