@@ -169,7 +169,7 @@ export const recipes: Recipe[] = [
       {description: 'Add vegetables and broth, and simmer for 1 hour.'},
     ],
   },
-  {
+  {``
     id: 9,
     name: 'Omelette',
     ingredients: [

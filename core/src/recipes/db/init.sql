@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS recipes;
 
 CREATE TABLE recipes (
     recipe_id SERIAL PRIMARY KEY,
-    recipe_name VARCHAR(255) NOT NULL
+    recipe_name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE ingredients (
