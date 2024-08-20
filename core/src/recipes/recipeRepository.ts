@@ -48,3 +48,114 @@ export async function createIngredient(ingredientData: {
     client.release();
   }
 }
+
+export async function getIngredients(): Promise<{}> {
+  const client = await RecipesDb.connect();
+  try {
+    const queryText = `
+      SELECT ingredients.ingredient_id, ingredients.ingredient_name, nutrition.unit, nutrition.calories, nutrition.fat, nutrition.carbs, nutrition.protein
+      FROM ingredients
+      JOIN nutrition ON ingredients.ingredient_id = nutrition.ingredient_id
+    `;
+    const result = await client.query(queryText);
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+export async function getIngredientById(id: number): Promise<{}> {
+  const client = await RecipesDb.connect();
+  try {
+    const queryText = `
+      SELECT ingredients.ingredient_id, ingredients.ingredient_name, nutrition.unit, nutrition.calories, nutrition.fat, nutrition.carbs, nutrition.protein
+      FROM ingredients
+      JOIN nutrition ON ingredients.ingredient_id = nutrition.ingredient_id
+      WHERE ingredients.ingredient_id = $1
+    `;
+    const result = await client.query(queryText, [id]);
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateIngredient(
+  id: number,
+  ingredientData: {
+    name: string;
+    unit: string;
+    calories: number;
+    fat: number;
+    carbs: number;
+    protein: number;
+  }
+): Promise<{}> {
+  const client = await RecipesDb.connect();
+  try {
+    await client.query('BEGIN');
+    const updateIngredientQuery = `
+      UPDATE ingredients
+      SET ingredient_name = $1
+      WHERE ingredient_id = $2
+      RETURNING *
+    `;
+    const updatedIngredientResult = await client.query(updateIngredientQuery, [
+      ingredientData.name,
+      id,
+    ]);
+    const updateNutritionQuery = `
+      UPDATE nutrition
+      SET unit = $1, calories = $2, fat = $3, carbs = $4, protein = $5
+      WHERE ingredient_id = $6
+      RETURNING *
+    `;
+    const updatedNutritionResult = await client.query(updateNutritionQuery, [
+      ingredientData.unit,
+      ingredientData.calories,
+      ingredientData.fat,
+      ingredientData.carbs,
+      ingredientData.protein,
+      id,
+    ]);
+    client.query('COMMIT');
+    const updatedIngredient = {
+      id: updatedIngredientResult.rows[0].ingredient_id,
+      name: updatedIngredientResult.rows[0].ingredient_name,
+      unit: updatedNutritionResult.rows[0].unit,
+      calories: updatedNutritionResult.rows[0].calories,
+      fat: updatedNutritionResult.rows[0].fat,
+      carbs: updatedNutritionResult.rows[0].carbs,
+      protein: updatedNutritionResult.rows[0].protein,
+    };
+    return updatedIngredient;
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}
+
+export async function deleteIngredient(id: number): Promise<void> {
+  const client = await RecipesDb.connect();
+  try {
+    await client.query('BEGIN');
+    const deleteNutritionQuery = `
+      DELETE FROM nutrition
+      WHERE ingredient_id = $1
+    `;
+    await client.query(deleteNutritionQuery, [id]);
+    const deleteIngredientQuery = `
+      DELETE FROM ingredients
+      WHERE ingredient_id = $1
+    `;
+    await client.query(deleteIngredientQuery, [id]);
+    client.query('COMMIT');
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
+}

@@ -17,6 +17,7 @@ app.use(express.json());
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
+
 recipeRoutes(app);
 
 const PORT = process.env.PORT || 3000;
