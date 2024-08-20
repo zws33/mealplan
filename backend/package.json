@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,13 +7,12 @@
     "test": "jest",
     "lint": "gts lint",
     "clean": "gts clean",
-    "compile": "tsc",
+    "build": "tsc",
     "fix": "gts fix",
-    "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run lint",
     "watch": "tsc -w",
-    "start-dev": "npx nodemon src/index.ts",
+    "dev": "npx ts-node ./src/index.ts",
     "start": "node build/src/index.js"
   },
   "keywords": [],

@@ -41,18 +41,18 @@ export async function createRecipe(recipeData: {
         quantifiedIngredient.unit,
       ]);
     });
-    // recipeData.instructions.forEach(async (instruction, index) => {
-    //   console.log(instruction);
-    //   const recipeInstructionQueryText = `
-    //     INSERT INTO recipe_instructions (recipe_id, step_number, description)
-    //     VALUES ($1, $2, $3)
-    //   `;
-    //   await client.query(recipeInstructionQueryText, [
-    //     recipeQueryResult.rows[0].recipe_id,
-    //     index + 1,
-    //     instruction.description,
-    //   ]);
-    // });
+    recipeData.instructions.forEach(async (instruction, index) => {
+      console.log(instruction);
+      const recipeInstructionQueryText = `
+        INSERT INTO recipe_instructions (recipe_id, step_number, description)
+        VALUES ($1, $2, $3)
+      `;
+      await client.query(recipeInstructionQueryText, [
+        recipeQueryResult.rows[0].recipe_id,
+        index + 1,
+        instruction.description,
+      ]);
+    });
     await client.query('COMMIT');
     return {
       id: recipeQueryResult.rows[0].recipe_id,
