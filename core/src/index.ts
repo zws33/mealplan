@@ -1,10 +1,10 @@
 import express, {Application, Request, Response} from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
-import {recipeRoutes} from './recipeRoutes';
+import {ingredientsRouter} from './recipes/routes/ingredientsRouter';
 
 const app: Application = express();
-// CORS configration options
+
 const corsOptions = {
   origin: '*',
   optionsSucessStatus: 200,
@@ -18,7 +18,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
-recipeRoutes(app);
+app.use(ingredientsRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
