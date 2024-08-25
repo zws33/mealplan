@@ -14,5 +14,6 @@ test('buildMealPlans returns correct meal plans', () => {
     {id: 10, calories: 350},
   ];
   const mealPlans = buildMealPlans(meals, 3, 1700);
+  console.log(mealPlans);
   expect(mealPlans.length).toEqual(118);
 });

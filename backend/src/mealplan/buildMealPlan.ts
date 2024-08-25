@@ -6,11 +6,13 @@ export function buildMealPlans(
   calorieLimit: number
 ): Meal[][] {
   const mealPlans: Meal[][] = [];
+  let recurseCount = 0;
   function backtrack(
     index: number,
     currentCalories: number,
     currentMeals: Meal[]
   ) {
+    console.log(recurseCount++);
     if (currentMeals.length === mealCount) {
       if (currentCalories <= calorieLimit) {
         mealPlans.push([...currentMeals]);
@@ -25,9 +27,8 @@ export function buildMealPlans(
       currentMeals.push(nextMeal);
       backtrack(index + 1, currentCalories + nextMeal.calories, currentMeals);
       currentMeals.pop();
-    } else {
-      backtrack(index + 1, currentCalories, currentMeals);
     }
+    backtrack(index + 1, currentCalories, currentMeals);
   }
   backtrack(0, 0, []);
   return mealPlans;
