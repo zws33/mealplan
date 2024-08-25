@@ -26,7 +26,6 @@ export function buildMealPlans(
       backtrack(index + 1, currentCalories + nextMeal.calories, currentMeals);
       currentMeals.pop();
     }
-
     backtrack(index + 1, currentCalories, currentMeals);
   }
   backtrack(0, 0, []);
