@@ -28,7 +28,6 @@ CREATE TABLE recipe_ingredients (
 CREATE TABLE nutrition (
     ingredient_id INT,
     unit VARCHAR(50),
-    calories DECIMAL(10, 2),
     fat DECIMAL(10, 2),
     carbs DECIMAL(10, 2),
     protein DECIMAL(10, 2),

@@ -1,4 +1,4 @@
-import {Recipe} from './recipe';
+import {Recipe} from './models';
 
 export const recipes: Recipe[] = [
   {
