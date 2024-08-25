@@ -1,7 +1,7 @@
-import {RecipesDb} from './data/database';
+import {PostgresDb} from '../db/postgresDb';
 
 export async function getRecipes(): Promise<{}> {
-  const client = await RecipesDb.connect();
+  const client = await PostgresDb.connect();
   try {
     const queryText = `
       SELECT * FROM recipes
@@ -17,7 +17,7 @@ export async function createRecipe(recipeData: {
   ingredients: {id: number; quantity: number; unit: string}[];
   instructions: {description: string}[];
 }): Promise<{}> {
-  const client = await RecipesDb.connect();
+  const client = await PostgresDb.connect();
   try {
     await client.query('BEGIN');
     const recipeQueryText = `

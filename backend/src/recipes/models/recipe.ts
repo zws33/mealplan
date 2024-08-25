@@ -19,3 +19,12 @@ export type Ingredient = {
 export type Instruction = {
   description: string;
 };
+
+export type Nutrition = {
+  ingredient_id: number;
+  unit: string;
+  calories: number;
+  fat: number;
+  carbs: number;
+  protein: number;
+};
