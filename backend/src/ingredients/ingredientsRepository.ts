@@ -1,10 +1,18 @@
 import {Pool} from 'pg';
-import {Ingredient} from '../models/models';
+import {Ingredient, Nutrition} from '../models/models';
 
 export interface IngredientRepository {
-  insertIngredient(ingredientData: {name: string}): Promise<Ingredient>;
-  findAllIngredients(): Promise<Ingredient[]>;
-  findIngredientById(ingredientId: number): Promise<Ingredient>;
+  insertIngredient(
+    ingredientData: {name: string},
+    nutritionData: {
+      unit: string;
+      fat: number;
+      carbs: number;
+      protein: number;
+    }
+  ): Promise<Ingredient>;
+  getAllIngredients(): Promise<Ingredient[]>;
+  getIngredientById(ingredientId: number): Promise<Ingredient>;
   updateIngredient(
     id: number,
     ingredientData: {name: string}
@@ -14,17 +22,45 @@ export interface IngredientRepository {
 
 export class PostgresIngredientRepository implements IngredientRepository {
   constructor(private readonly pool: Pool) {}
-  async insertIngredient(ingredientData: {name: string}): Promise<Ingredient> {
-    const queryText =
+  async insertIngredient(
+    ingredientData: {name: string},
+    nutritionData: {
+      unit: string;
+      fat: number;
+      carbs: number;
+      protein: number;
+    }
+  ): Promise<Ingredient> {
+    const ingredientsQuery =
       'INSERT INTO ingredients (ingredient_name) VALUES ($1) RETURNING *';
-    const result = await this.pool.query(queryText, [ingredientData.name]);
+    const ingredientQueryResult = await this.pool.query(ingredientsQuery, [
+      ingredientData.name,
+    ]);
+    const ingredientId = ingredientQueryResult.rows[0].ingredient_id;
+    const nutritionQuery = `
+        INSERT INTO nutrition (ingredient_id, unit, fat, carbs, protein)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `;
+    const nutritionQueryResult = await this.pool.query(nutritionQuery, [
+      ingredientId,
+      nutritionData.unit,
+      nutritionData.fat,
+      nutritionData.carbs,
+      nutritionData.protein,
+    ]);
+
+    if (nutritionQueryResult.rows.length === 0) {
+      throw new Error('Failed to insert nutrition data');
+    }
+
     return {
-      id: result.rows[0].ingredient_id,
-      name: result.rows[0].ingredient_name,
+      id: ingredientQueryResult.rows[0].ingredient_id,
+      name: ingredientQueryResult.rows[0].ingredient_name,
     };
   }
 
-  async findAllIngredients(): Promise<Ingredient[]> {
+  async getAllIngredients(): Promise<Ingredient[]> {
     const queryText = `
         SELECT ingredients.ingredient_id, ingredients.ingredient_name FROM ingredients
       `;
@@ -35,7 +71,7 @@ export class PostgresIngredientRepository implements IngredientRepository {
     }));
   }
 
-  async findIngredientById(ingredientId: number): Promise<Ingredient> {
+  async getIngredientById(ingredientId: number): Promise<Ingredient> {
     const queryText = `
         SELECT ingredients.ingredient_name FROM ingredients
         WHERE ingredients.ingredient_id = $1
@@ -88,5 +124,76 @@ export class PostgresIngredientRepository implements IngredientRepository {
         name: row.ingredient_name,
       }))[0];
     }
+  }
+
+  async getNutritionById(ingredientId: number) {
+    const query = `
+    SELECT * FROM nutrition
+    WHERE ingredient_id = $1
+    `;
+    const result = await this.pool.query<Nutrition>(query, [ingredientId]);
+    return result.rows;
+  }
+
+  async createNutrition(
+    ingredientId: number,
+    nutritionData: {
+      unit: string;
+      fat: number;
+      carbs: number;
+      protein: number;
+    }
+  ) {
+    const query = `
+    INSERT INTO nutrition (ingredient_id, unit, fat, carbs, protein) 
+    VALUES ($1, $2, $3, $4, $5) 
+    RETURNING *
+    `;
+    const result = await this.pool.query<Nutrition>(query, [
+      ingredientId,
+      nutritionData.unit,
+      nutritionData.fat,
+      nutritionData.carbs,
+      nutritionData.protein,
+    ]);
+    return result.rows;
+  }
+
+  async deleteNutrition(ingredientId: number, unit: string) {
+    const query = `
+    DELETE FROM nutrition
+    WHERE ingredient_id = $1 AND unit = $2
+    RETURNING * 
+    `;
+    const result = await this.pool.query<Nutrition>(query, [
+      ingredientId,
+      unit,
+    ]);
+    return result.rows;
+  }
+
+  async updateNutrition(
+    ingredientId: number,
+    nutritionData: {
+      unit: string;
+      fat: number;
+      carbs: number;
+      protein: number;
+    }
+  ) {
+    const query = `
+    UPDATE nutrition
+    SET unit = $2, fat = $3, carbs = $4, protein = $5
+    WHERE ingredient_id = $1
+    RETURNING *
+    `;
+    const result = await this.pool.query<Nutrition>(query, [
+      ingredientId,
+      nutritionData.unit,
+      nutritionData.fat,
+      nutritionData.carbs,
+      nutritionData.protein,
+    ]);
+    return result.rows;
   }
 }
