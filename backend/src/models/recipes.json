@@ -1,27 +1,5 @@
 [
   {
-    "id": 4,
-    "name": "Pancakes",
-    "mealType": "breakfast",
-    "ingredients": [
-      { "ingredient": { "id": 19, "name": "Flour" }, "amount": 200, "unit": "g" },
-      { "ingredient": { "id": 20, "name": "Milk" }, "amount": 300, "unit": "ml" },
-      { "ingredient": { "id": 21, "name": "Egg" }, "amount": 2, "unit": "pcs" },
-      { "ingredient": { "id": 22, "name": "Sugar" }, "amount": 30, "unit": "g" },
-      { "ingredient": { "id": 23, "name": "Baking Powder" }, "amount": 1, "unit": "tsp" },
-      { "ingredient": { "id": 24, "name": "Butter" }, "amount": 2, "unit": "tbsp" }
-    ],
-    "instructions": [
-      { "description": "Mix flour, sugar, and baking powder in a bowl." },
-      { "description": "Add eggs and milk, and whisk until smooth." },
-      { "description": "Heat a pan and melt some butter." },
-      { "description": "Pour batter onto the pan and cook until bubbles form." },
-      { "description": "Flip and cook until golden brown on both sides." },
-      { "description": "Serve with syrup or fruit toppings." }
-    ],
-    "macros": { "fat": 15, "carbohydrate": 50, "protein": 8 }
-  },
-  {
     "id": 10,
     "name": "Omelette",
     "mealType": "breakfast",
@@ -134,19 +112,22 @@
       { "ingredient": { "id": 12, "name": "Broccoli" }, "amount": 100, "unit": "g" },
       { "ingredient": { "id": 13, "name": "Carrot" }, "amount": 100, "unit": "g" },
       { "ingredient": { "id": 14, "name": "Bell Pepper" }, "amount": 100, "unit": "g" },
+      { "ingredient": { "id": 81, "name": "Firm Tofu" }, "amount": 150, "unit": "g" },
       { "ingredient": { "id": 15, "name": "Soy Sauce" }, "amount": 2, "unit": "tbsp" },
       { "ingredient": { "id": 16, "name": "Garlic" }, "amount": 2, "unit": "cloves" },
       { "ingredient": { "id": 17, "name": "Ginger" }, "amount": 1, "unit": "tsp" },
       { "ingredient": { "id": 18, "name": "Olive Oil" }, "amount": 1, "unit": "tbsp" }
     ],
     "instructions": [
+      { "description": "Press and cube the firm tofu." },
       { "description": "Heat olive oil in a pan over medium heat." },
       { "description": "Add garlic and ginger and sauté for 2 minutes." },
+      { "description": "Add tofu and stir-fry until golden brown." },
       { "description": "Add broccoli, carrot, and bell pepper and stir-fry for 5-7 minutes." },
       { "description": "Add soy sauce and cook for an additional 2 minutes." },
       { "description": "Serve hot with rice or noodles." }
     ],
-    "macros": { "fat": 5, "carbohydrate": 20, "protein": 5 }
+    "macros": { "fat": 10, "carbohydrate": 25, "protein": 22 }
   },
   {
     "id": 5,
@@ -217,19 +198,20 @@
     "mealType": "breakfast",
     "ingredients": [
       { "ingredient": { "id": 47, "name": "Bread" }, "amount": 4, "unit": "slices" },
-      { "ingredient": { "id": 21, "name": "Egg" }, "amount": 2, "unit": "pcs" },
+      { "ingredient": { "id": 21, "name": "Egg" }, "amount": 4, "unit": "pcs" },
       { "ingredient": { "id": 20, "name": "Milk" }, "amount": 100, "unit": "ml" },
+      { "ingredient": { "id": 74, "name": "Protein Powder" }, "amount": 25, "unit": "g" },
       { "ingredient": { "id": 22, "name": "Sugar" }, "amount": 1, "unit": "tbsp" },
       { "ingredient": { "id": 48, "name": "Cinnamon" }, "amount": 1, "unit": "tsp" },
       { "ingredient": { "id": 24, "name": "Butter" }, "amount": 2, "unit": "tbsp" }
     ],
     "instructions": [
-      { "description": "Whisk eggs, milk, sugar, and cinnamon in a bowl." },
-      { "description": "Dip bread slices into the egg mixture, coating both sides." },
+      { "description": "Whisk eggs, milk, protein powder, sugar, and cinnamon in a bowl." },
+      { "description": "Dip bread slices into the mixture, coating both sides." },
       { "description": "Heat butter in a pan and cook bread until golden brown on both sides." },
       { "description": "Serve with syrup and fresh fruit." }
     ],
-    "macros": { "fat": 18, "carbohydrate": 45, "protein": 10 }
+    "macros": { "fat": 22, "carbohydrate": 45, "protein": 22 }
   },
   {
     "id": 12,
@@ -238,45 +220,50 @@
     "ingredients": [
       { "ingredient": { "id": 49, "name": "Banana" }, "amount": 1, "unit": "pc" },
       { "ingredient": { "id": 50, "name": "Frozen Berries" }, "amount": 100, "unit": "g" },
-      { "ingredient": { "id": 51, "name": "Greek Yogurt" }, "amount": 150, "unit": "g" },
+      { "ingredient": { "id": 51, "name": "Greek Yogurt" }, "amount": 250, "unit": "g" },
+      { "ingredient": { "id": 74, "name": "Protein Powder" }, "amount": 25, "unit": "g" },
       { "ingredient": { "id": 52, "name": "Granola" }, "amount": 50, "unit": "g" },
       { "ingredient": { "id": 53, "name": "Honey" }, "amount": 1, "unit": "tbsp" }
     ],
     "instructions": [
-      { "description": "Blend banana, frozen berries, and Greek yogurt until smooth." },
+      { "description": "Blend banana, frozen berries, Greek yogurt, and protein powder until smooth." },
       { "description": "Pour into a bowl and top with granola and honey." },
       { "description": "Add extra fruit toppings if desired." }
     ],
-    "macros": { "fat": 8, "carbohydrate": 55, "protein": 12 }
+    "macros": { "fat": 10, "carbohydrate": 55, "protein": 24 }
   },
   {
     "id": 13,
     "name": "Avocado Toast",
     "mealType": "breakfast",
     "ingredients": [
-      { "ingredient": { "id": 47, "name": "Bread" }, "amount": 2, "unit": "slices" },
+      { "ingredient": { "id": 79, "name": "High-Protein Bread" }, "amount": 2, "unit": "slices" },
       { "ingredient": { "id": 54, "name": "Avocado" }, "amount": 1, "unit": "pc" },
       { "ingredient": { "id": 55, "name": "Lemon Juice" }, "amount": 1, "unit": "tbsp" },
+      { "ingredient": { "id": 21, "name": "Egg" }, "amount": 2, "unit": "pcs" },
       { "ingredient": { "id": 56, "name": "Salt" }, "amount": 0.5, "unit": "tsp" },
       { "ingredient": { "id": 57, "name": "Black Pepper" }, "amount": 0.5, "unit": "tsp" }
     ],
     "instructions": [
       { "description": "Toast the bread slices until golden brown." },
       { "description": "Mash avocado with lemon juice, salt, and pepper." },
+      { "description": "Cook the eggs to your preference (fried, scrambled, or poached)." },
       { "description": "Spread the avocado mixture on the toast." },
+      { "description": "Place the cooked eggs on top of the avocado toast." },
       { "description": "Serve immediately with a sprinkle of extra pepper if desired." }
     ],
-    "macros": { "fat": 20, "carbohydrate": 30, "protein": 6 }
+    "macros": { "fat": 25, "carbohydrate": 35, "protein": 22 }
   },
   {
     "id": 14,
     "name": "Quinoa Salad",
     "mealType": "lunch",
     "ingredients": [
-      { "ingredient": { "id": 58, "name": "Quinoa" }, "amount": 150, "unit": "g" },
+      { "ingredient": { "id": 58, "name": "Quinoa" }, "amount": 200, "unit": "g" },
       { "ingredient": { "id": 14, "name": "Bell Pepper" }, "amount": 1, "unit": "pc" },
       { "ingredient": { "id": 59, "name": "Cucumber" }, "amount": 1, "unit": "pc" },
       { "ingredient": { "id": 31, "name": "Tomato" }, "amount": 1, "unit": "pc" },
+      { "ingredient": { "id": 80, "name": "Chickpeas" }, "amount": 100, "unit": "g" },
       { "ingredient": { "id": 60, "name": "Feta Cheese" }, "amount": 50, "unit": "g" },
       { "ingredient": { "id": 27, "name": "Olive Oil" }, "amount": 2, "unit": "tbsp" },
       { "ingredient": { "id": 55, "name": "Lemon Juice" }, "amount": 1, "unit": "tbsp" }
@@ -284,10 +271,10 @@
     "instructions": [
       { "description": "Cook quinoa according to package instructions." },
       { "description": "Chop bell pepper, cucumber, and tomato." },
-      { "description": "Mix quinoa, vegetables, and feta cheese in a bowl." },
+      { "description": "Mix quinoa, chickpeas, vegetables, and feta cheese in a bowl." },
       { "description": "Drizzle with olive oil and lemon juice before serving." }
     ],
-    "macros": { "fat": 15, "carbohydrate": 45, "protein": 12 }
+    "macros": { "fat": 16, "carbohydrate": 50, "protein": 22 }
   },
   {
     "id": 15,
@@ -394,5 +381,62 @@
       { "description": "Mix well and serve hot." }
     ],
     "macros": { "fat": 25, "carbohydrate": 45, "protein": 25 }
+  },
+  {
+    "id": 20,
+    "name": "Protein Pancakes",
+    "mealType": "breakfast",
+    "ingredients": [
+      { "ingredient": { "id": 72, "name": "Oats" }, "amount": 50, "unit": "g" },
+      { "ingredient": { "id": 73, "name": "Egg Whites" }, "amount": 150, "unit": "ml" },
+      { "ingredient": { "id": 74, "name": "Protein Powder" }, "amount": 25, "unit": "g" },
+      { "ingredient": { "id": 54, "name": "Banana" }, "amount": 1, "unit": "pc" },
+      { "ingredient": { "id": 24, "name": "Butter" }, "amount": 1, "unit": "tbsp" }
+    ],
+    "instructions": [
+      { "description": "Blend oats, egg whites, protein powder, and banana until smooth." },
+      { "description": "Heat butter in a pan over medium heat." },
+      { "description": "Pour batter into the pan to form pancakes and cook until bubbles form on top." },
+      { "description": "Flip and cook until golden brown on both sides." },
+      { "description": "Serve with fresh fruit or syrup." }
+    ],
+    "macros": { "fat": 8, "carbohydrate": 35, "protein": 20 }
+  },
+  {
+    "id": 21,
+    "name": "Greek Yogurt Parfait",
+    "mealType": "breakfast",
+    "ingredients": [
+      { "ingredient": { "id": 51, "name": "Greek Yogurt" }, "amount": 200, "unit": "g" },
+      { "ingredient": { "id": 75, "name": "Almonds" }, "amount": 30, "unit": "g" },
+      { "ingredient": { "id": 50, "name": "Frozen Berries" }, "amount": 100, "unit": "g" },
+      { "ingredient": { "id": 52, "name": "Granola" }, "amount": 40, "unit": "g" },
+      { "ingredient": { "id": 53, "name": "Honey" }, "amount": 1, "unit": "tbsp" }
+    ],
+    "instructions": [
+      { "description": "Layer Greek yogurt, berries, granola, and almonds in a parfait glass." },
+      { "description": "Drizzle honey on top." },
+      { "description": "Serve immediately or chill for later." }
+    ],
+    "macros": { "fat": 12, "carbohydrate": 40, "protein": 18 }
+  },
+  {
+    "id": 22,
+    "name": "Egg and Spinach Wrap",
+    "mealType": "breakfast",
+    "ingredients": [
+      { "ingredient": { "id": 21, "name": "Egg" }, "amount": 3, "unit": "pcs" },
+      { "ingredient": { "id": 76, "name": "Spinach" }, "amount": 50, "unit": "g" },
+      { "ingredient": { "id": 77, "name": "Whole Wheat Tortilla" }, "amount": 1, "unit": "pc" },
+      { "ingredient": { "id": 78, "name": "Feta Cheese" }, "amount": 30, "unit": "g" },
+      { "ingredient": { "id": 27, "name": "Olive Oil" }, "amount": 1, "unit": "tbsp" }
+    ],
+    "instructions": [
+      { "description": "Heat olive oil in a pan and sauté spinach until wilted." },
+      { "description": "Scramble eggs in the same pan until cooked through." },
+      { "description": "Place the eggs and spinach in a whole wheat tortilla." },
+      { "description": "Sprinkle with feta cheese, wrap, and serve warm." }
+    ],
+    "macros": { "fat": 14, "carbohydrate": 25, "protein": 22 }
   }
 ]

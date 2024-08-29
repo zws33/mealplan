@@ -28,6 +28,7 @@ export class InMemoryRecipeRepository implements RecipeRepository {
       return Array.from(this.recipes.values());
     }
   }
+
   async init() {
     const recipes = await this.readAndValidateRecipeFile(this.filePath);
     recipes.forEach(recipe => {
