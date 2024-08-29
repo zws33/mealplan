@@ -1,33 +1,47 @@
-type Meal = {id: number; calories: number};
+type Meal = {id: number; calories: number; protein: number};
 
-export function buildMealPlans(
+export function buildMealPlan(
   availableMeals: Meal[],
   mealCount: number,
-  calorieLimit: number
-): Meal[][] {
-  const mealPlans: Meal[][] = [];
+  calorieLimit: number,
+  proteinMin: number
+): Meal[] | null {
   function backtrack(
     index: number,
     currentCalories: number,
+    currentProtein: number,
     currentMeals: Meal[]
-  ) {
+  ): Meal[] | null {
     if (currentMeals.length === mealCount) {
-      if (currentCalories <= calorieLimit) {
-        mealPlans.push([...currentMeals]);
-        return;
+      if (currentCalories <= calorieLimit && currentProtein > proteinMin) {
+        return [...currentMeals];
       }
+      return null;
     }
     if (index === availableMeals.length) {
-      return;
+      return null;
     }
+
     const nextMeal = availableMeals[index];
-    if (currentCalories + nextMeal.calories < calorieLimit) {
+
+    // Try including the current meal
+    if (currentCalories + nextMeal.calories <= calorieLimit) {
       currentMeals.push(nextMeal);
-      backtrack(index + 1, currentCalories + nextMeal.calories, currentMeals);
+      const result = backtrack(
+        index + 1,
+        currentCalories + nextMeal.calories,
+        currentProtein + nextMeal.protein,
+        currentMeals
+      );
+      if (result) {
+        return result;
+      }
       currentMeals.pop();
     }
-    backtrack(index + 1, currentCalories, currentMeals);
+
+    // Try excluding the current meal
+    return backtrack(index + 1, currentCalories, currentProtein, currentMeals);
   }
-  backtrack(0, 0, []);
-  return mealPlans;
+
+  return backtrack(0, 0, 0, []);
 }

@@ -1,4 +1,4 @@
-import {buildMealPlans} from './buildMealPlan';
+import {buildMealPlan} from './buildMealPlan';
 
 test('buildMealPlans returns correct meal plans', () => {
   const meals = [
@@ -13,6 +13,6 @@ test('buildMealPlans returns correct meal plans', () => {
     {id: 9, calories: 250},
     {id: 10, calories: 350},
   ];
-  const mealPlans = buildMealPlans(meals, 3, 1700);
+  const mealPlans = buildMealPlan(meals, 3, 1700);
   expect(mealPlans.length).toEqual(118);
 });
