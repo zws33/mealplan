@@ -39,11 +39,13 @@ describe('MealPlanBuilder', () => {
       expect(result).toBeDefined();
       expect(result!.length).toBe(numberOfDays);
       expect(result!.every(meal => meal.mealType === mealType)).toBe(true);
-      expect(result!.every(meal => meal.calories <= dailyCalorieLimit)).toBe(
-        true
+      const totalCalories = result!.reduce(
+        (sum, meal) => sum + meal.calories,
+        0
       );
+      expect(totalCalories < dailyCalorieLimit).toBe(true);
       const averageProtein =
-        result!.reduce((sum, meal) => meal.protein + sum, 0) / result!.length;
+        result!.reduce((sum, meal) => sum + meal.protein, 0) / result!.length;
       expect(averageProtein).toBeGreaterThanOrEqual(desiredProteinPerMeal);
     }
   });
