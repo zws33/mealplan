@@ -1,6 +1,5 @@
+import {MealType} from '../models/models';
 import {groupBy} from '../util';
-
-type MealType = 'breakfast' | 'lunch' | 'dinner';
 
 type Meal = {
   id: number;
@@ -15,8 +14,8 @@ export class MealPlanBuilder {
   calorieLimit: number;
   desiredProteinPerMeal: number;
   constructor(
-    private readonly availableMeals: Meal[],
-    private readonly constraints: {
+    availableMeals: Meal[],
+    constraints: {
       numberOfDays: number;
       dailyCalorieLimit: number;
       desiredProteinPerMeal: number;

@@ -14,19 +14,14 @@ export class InMemoryRecipeRepository implements RecipeRepository {
     if (this.recipes.size === 0) {
       await this.init();
     }
-    {
-      return this.recipes.get(id)!;
-    }
+    return this.recipes.get(id)!;
   }
 
   async getRecipes(): Promise<Recipe[]> {
     if (this.recipes.size === 0) {
       await this.init();
-      return Array.from(this.recipes.values());
     }
-    {
-      return Array.from(this.recipes.values());
-    }
+    return Array.from(this.recipes.values());
   }
 
   async init() {

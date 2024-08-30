@@ -25,10 +25,12 @@ const MacrosSchema = z.object({
   protein: z.number(),
 });
 
+const MealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner']);
+
 // Recipe Schema
 export const RecipeSchema = z.object({
   id: z.number(),
-  mealType: z.enum(['breakfast', 'lunch', 'dinner']),
+  mealType: MealTypeSchema,
   name: z.string(),
   ingredients: z.array(QuantifiedIngredientSchema),
   instructions: z.array(InstructionSchema),
@@ -41,6 +43,7 @@ export type Ingredient = z.infer<typeof IngredientSchema>;
 export type QuantifiedIngredient = z.infer<typeof QuantifiedIngredientSchema>;
 export type Instruction = z.infer<typeof InstructionSchema>;
 export type Macros = z.infer<typeof MacrosSchema>;
+export type MealType = z.infer<typeof MealTypeSchema>;
 
 export function calculateCalories(macros: Macros): number {
   return macros.fat * 9 + macros.carbohydrate * 4 + macros.protein * 4;
@@ -48,4 +51,8 @@ export function calculateCalories(macros: Macros): number {
 
 export function getShoppingList(recipe: Recipe): QuantifiedIngredient[] {
   return recipe.ingredients;
+}
+
+export function getMacros(recipe: Recipe): Macros {
+  return recipe.macros;
 }
