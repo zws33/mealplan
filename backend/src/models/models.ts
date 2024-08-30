@@ -4,6 +4,11 @@ import {z} from 'zod';
 const IngredientSchema = z.object({
   id: z.number(),
   name: z.string(),
+  unit: z.string(),
+  servingSize: z.number(),
+  protein: z.number(),
+  carbohydrates: z.number(),
+  fat: z.number(),
 });
 
 // QuantifiedIngredient Schema
@@ -34,7 +39,6 @@ export const RecipeSchema = z.object({
   name: z.string(),
   ingredients: z.array(QuantifiedIngredientSchema),
   instructions: z.array(InstructionSchema),
-  macros: MacrosSchema,
 });
 
 // Infer the TypeScript type from the zod schema
@@ -45,7 +49,8 @@ export type Instruction = z.infer<typeof InstructionSchema>;
 export type Macros = z.infer<typeof MacrosSchema>;
 export type MealType = z.infer<typeof MealTypeSchema>;
 
-export function calculateCalories(macros: Macros): number {
+export function calculateRecipeCalories(recipe: Recipe): number {
+  const macros = getMacros(recipe);
   return macros.fat * 9 + macros.carbohydrate * 4 + macros.protein * 4;
 }
 
@@ -54,5 +59,24 @@ export function getShoppingList(recipe: Recipe): QuantifiedIngredient[] {
 }
 
 export function getMacros(recipe: Recipe): Macros {
-  return recipe.macros;
+  const macros = recipe.ingredients.map(getMacrosForIngredient);
+  return macros.reduce((sum, current) => {
+    return {
+      fat: sum.fat + current.fat,
+      carbohydrate: sum.carbohydrate + current.carbohydrate,
+      protein: sum.protein + current.protein,
+    };
+  });
+}
+
+function getMacrosForIngredient(
+  quantifiedIngredient: QuantifiedIngredient
+): Macros {
+  const {ingredient, amount} = quantifiedIngredient;
+  const multiplier = amount / ingredient.servingSize;
+  return {
+    fat: ingredient.fat * multiplier,
+    carbohydrate: ingredient.carbohydrates * multiplier,
+    protein: ingredient.protein * multiplier,
+  };
 }
