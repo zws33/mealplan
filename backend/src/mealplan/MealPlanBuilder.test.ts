@@ -1,15 +1,13 @@
 import {MealPlanBuilder} from './mealPlanBuilder';
 import {calculateRecipeCalories, getMacros} from '../models/models';
-import {Recipe, RecipeSchema} from '../models/models';
-import {readFileSync} from 'node:fs';
+import {ModelGenerator} from '../models/modelGenerator';
 
 describe('MealPlanBuilder', () => {
-  const recipeFilePath = './src/models/recipes.json';
   const mealTypes = ['breakfast', 'lunch', 'dinner'] as const;
   const numberOfDays = 3;
   const dailyCalorieLimit = 10000;
   const desiredProteinPerMeal = 5;
-  const recipes = readAndValidateRecipeFile(recipeFilePath);
+  const recipes = ModelGenerator.generateRecipes(100);
   const meals = recipes.map(recipe => {
     return {
       id: recipe.id,
@@ -24,7 +22,7 @@ describe('MealPlanBuilder', () => {
     desiredProteinPerMeal,
   });
   const mealPlan = builder.buildMealPlan();
-  test('mealplan contains meals divided by type', () => {
+  test('mealplan contains meals grouped by type', () => {
     expect(mealPlan.size).toBe(mealTypes.length);
     expect(mealPlan.get('breakfast')).toBeDefined();
     expect(mealPlan.get('lunch')).toBeDefined();
@@ -47,20 +45,3 @@ describe('MealPlanBuilder', () => {
     });
   }
 });
-
-function readAndValidateRecipeFile(filePath: string) {
-  try {
-    const fileContent = readFileSync(filePath, 'utf-8');
-
-    const recipeData: Recipe[] = JSON.parse(fileContent).map(
-      (recipe: unknown) => {
-        return RecipeSchema.parse(recipe);
-      }
-    );
-
-    return recipeData;
-  } catch (error) {
-    console.error('Error reading, parsing, or validating recipe file', error);
-    throw error;
-  }
-}
