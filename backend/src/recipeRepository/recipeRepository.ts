@@ -1,8 +1,7 @@
 import {readFileSync} from 'node:fs';
-import {Recipe, RecipeSchema} from './models';
+import {Recipe, RecipeSchema} from '../models/models';
 
 export interface RecipeRepository {
-  getRecipes(): Promise<Recipe[]>;
   getRecipeById(id: number): Promise<Recipe>;
 }
 
@@ -14,10 +13,6 @@ export class InMemoryRecipeRepository implements RecipeRepository {
 
   async getRecipeById(id: number): Promise<Recipe> {
     return this.recipes.get(id)!;
-  }
-
-  async getRecipes(): Promise<Recipe[]> {
-    return Array.from(this.recipes.values());
   }
 
   private readAndValidateRecipeFile(filePath: string) {

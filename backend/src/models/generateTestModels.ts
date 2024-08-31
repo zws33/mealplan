@@ -1,16 +1,15 @@
+import {writeFileSync} from 'fs';
 import {ModelGenerator} from './modelGenerator';
-import * as fs from 'fs';
-async function writeJsonToFile(filePath: string, data: any) {
+
+(async () => {
+  const filePath = process.argv[2];
+  const count = parseInt(process.argv[3], 10) || 10;
+  const recipes = ModelGenerator.generateRecipes(count);
   try {
-    const jsonString = JSON.stringify(data, null, 2);
-    fs.writeFileSync(filePath, jsonString, 'utf-8');
+    const jsonString = JSON.stringify(recipes, null, 2);
+    writeFileSync(filePath, jsonString, 'utf-8');
     console.log(`JSON data written to ${filePath}`);
   } catch (error) {
     console.error('Error writing JSON to file:', error);
   }
-}
-
-(async () => {
-  const recipes = ModelGenerator.generateRecipes(100);
-  await writeJsonToFile('./src/models/recipes.json', recipes);
 })();
