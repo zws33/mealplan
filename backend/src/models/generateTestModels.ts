@@ -1,4 +1,4 @@
-import {ModelGenerator} from './models/ModelGenerator';
+import {ModelGenerator} from './modelGenerator';
 import * as fs from 'fs';
 async function writeJsonToFile(filePath: string, data: any) {
   try {

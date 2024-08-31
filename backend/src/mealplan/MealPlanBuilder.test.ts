@@ -1,4 +1,4 @@
-import {MealPlanBuilder} from './MealPlanBuilder';
+import {MealPlanBuilder} from './mealPlanBuilder';
 import {calculateRecipeCalories, getMacros} from '../models/models';
 import {Recipe, RecipeSchema} from '../models/models';
 import {readFileSync} from 'node:fs';
