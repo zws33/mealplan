@@ -1,22 +1,44 @@
 import {LoremIpsum} from 'lorem-ipsum';
 import {Ingredient, Instruction, QuantifiedIngredient, Recipe} from './models';
 
-export const ModelGenerator = {
-  generateIngredient(count = 1) {
-    const ingredients: Ingredient[] = [];
-    for (let i = 0; i < count; i++) {
-      ingredients.push({
-        id: randomInt(0, 1000),
+type RecipeOptions = {
+  protein?: {min: number; max: number};
+  carbohydrates?: {min: number; max: number};
+  fat?: {min: number; max: number};
+  instructions?: {min: number; max: number};
+};
+
+export class ModelGenerator {
+  protein: {min: number; max: number};
+  carbohydrates: {min: number; max: number};
+  fat: {min: number; max: number};
+  instructions: {min: number; max: number};
+  constructor(recipeOptions: RecipeOptions = {}) {
+    this.protein = recipeOptions.protein ?? {min: 1, max: 100};
+    this.carbohydrates = recipeOptions.carbohydrates ?? {min: 1, max: 100};
+    this.fat = recipeOptions.fat ?? {min: 1, max: 100};
+    this.instructions = recipeOptions.instructions ?? {min: 1, max: 3};
+  }
+
+  generateIngredient(count = 1): Ingredient[] {
+    const ingredients = new Set<Ingredient>();
+    while (ingredients.size < count) {
+      ingredients.add({
+        id: randomInt(0, 10000),
         name: textGenerator.generateWords(randomInt(1, 3)),
         unit: 'g',
         servingSize: 100,
-        protein: randomInt(1, 100),
-        carbohydrates: randomInt(1, 100),
-        fat: randomInt(1, 100),
+        protein: randomInt(this.protein.min, this.protein.max),
+        carbohydrates: randomInt(
+          this.carbohydrates.min,
+          this.carbohydrates.max
+        ),
+        fat: randomInt(this.fat.min, this.fat.max),
       });
     }
-    return ingredients;
-  },
+    return [...ingredients];
+  }
+
   generateInstructions(count = 1) {
     const instructions: Instruction[] = [];
     for (let i = 0; i < count; i++) {
@@ -25,24 +47,27 @@ export const ModelGenerator = {
       });
     }
     return instructions;
-  },
+  }
+
   generateRecipes(count = 1): Recipe[] {
-    const recipes: Recipe[] = [];
+    const recipes = Array<Recipe>();
     for (let i = 0; i < count; i++) {
-      const ingredients = this.generateIngredient(randomInt(4, 8)).map(
+      const ingredients = [...this.generateIngredient(randomInt(4, 8))].map(
         toQuantifiedIngredient
       );
       recipes.push({
-        id: randomInt(0, 1000),
+        id: i,
         mealType: (['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)],
         name: textGenerator.generateWords(randomInt(1, 3)),
         ingredients: ingredients,
-        instructions: this.generateInstructions(randomInt(1, 3)),
+        instructions: this.generateInstructions(
+          randomInt(this.instructions.min, this.instructions.max)
+        ),
       });
     }
     return recipes;
-  },
-};
+  }
+}
 
 const textGenerator = new LoremIpsum({
   wordsPerSentence: {

@@ -49,6 +49,8 @@ export type Instruction = z.infer<typeof InstructionSchema>;
 export type Macros = z.infer<typeof MacrosSchema>;
 export type MealType = z.infer<typeof MealTypeSchema>;
 
+export type RecipeInput = Omit<Recipe, 'id'>;
+
 export function calculateRecipeCalories(recipe: Recipe): number {
   const macros = getMacros(recipe);
   return macros.fat * 9 + macros.carbohydrate * 4 + macros.protein * 4;

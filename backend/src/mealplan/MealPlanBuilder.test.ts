@@ -7,7 +7,7 @@ describe('MealPlanBuilder', () => {
   const numberOfDays = 3;
   const dailyCalorieLimit = 10000;
   const desiredProteinPerMeal = 5;
-  const recipes = ModelGenerator.generateRecipes(100);
+  const recipes = new ModelGenerator().generateRecipes(100);
   const meals = recipes.map(recipe => {
     return {
       id: recipe.id,

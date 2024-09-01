@@ -13,7 +13,7 @@ describe('InMemoryRecipeRepository', () => {
     if (existsSync(testDataPath)) {
       throw new Error('Test file already exists');
     }
-    const testRecipes = ModelGenerator.generateRecipes(10);
+    const testRecipes = new ModelGenerator().generateRecipes(10);
     const jsonString = JSON.stringify(testRecipes, null, 2);
     writeFileSync(testDataPath, jsonString, 'utf-8');
     expectedRecipe = testRecipes[0];
