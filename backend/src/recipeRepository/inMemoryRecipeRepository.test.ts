@@ -20,6 +20,13 @@ describe('InMemoryRecipeRepository', () => {
     expect(actual).toEqual(testRecipes[0]);
   });
 
+  test('getRecipeByMealType returns the correct recipes', async () => {
+    const actual = await repository.getRecipeByMealType('lunch');
+    const lunchRecipes = testRecipes.filter(r => r.mealType === 'lunch');
+    expect(actual.length).toBe(lunchRecipes.length);
+    expect(actual).toEqual(lunchRecipes);
+  });
+
   test('createRecipe should add a new recipe to the repository', async () => {
     const modelGenerator = new ModelGenerator();
     const recipeInput: RecipeInput = {
