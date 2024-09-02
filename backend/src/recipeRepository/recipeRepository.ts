@@ -1,8 +1,11 @@
 import {readFileSync} from 'node:fs';
-import {Recipe, RecipeSchema} from '../models/models';
+import {MealType, Recipe, RecipeInput, RecipeSchema} from '../models/models';
 
 export interface RecipeRepository {
-  getRecipeById(id: number): Promise<Recipe>;
+  createRecipe(recipe: RecipeInput): Promise<Recipe>;
+  getRecipeById(id: number): Promise<Recipe | undefined>;
+  updateRecipe(recipe: Recipe): Promise<Recipe>;
+  deleteRecipe(id: number): Promise<boolean>;
 }
 
 export class InMemoryRecipeRepository implements RecipeRepository {
@@ -11,8 +14,43 @@ export class InMemoryRecipeRepository implements RecipeRepository {
     this.readAndValidateRecipeFile(filePath);
   }
 
-  async getRecipeById(id: number): Promise<Recipe> {
-    return this.recipes.get(id)!;
+  async createRecipe(recipeInput: RecipeInput): Promise<Recipe> {
+    if (
+      [...this.recipes.values()]
+        .map(recipe => recipe.name)
+        .includes(recipeInput.name)
+    ) {
+      throw new Error('Recipe with this name already exists');
+    }
+    const id: number = this.recipes.size + 1;
+    const newRecipe = {
+      id,
+      ...recipeInput,
+    };
+    this.recipes.set(id, newRecipe);
+    return newRecipe;
+  }
+
+  async getRecipeById(id: number): Promise<Recipe | undefined> {
+    const result = this.recipes.get(id);
+    return result;
+  }
+
+  async getRecipeByMealType(mealType: MealType): Promise<Recipe[]> {
+    const result = [...this.recipes.values()].filter(
+      recipe => recipe.mealType === mealType
+    );
+    return result;
+  }
+
+  async updateRecipe(recipe: Recipe): Promise<Recipe> {
+    this.recipes.set(recipe.id, recipe);
+    return recipe;
+  }
+
+  async deleteRecipe(id: number): Promise<boolean> {
+    const result = this.recipes.delete(id);
+    return result;
   }
 
   private readAndValidateRecipeFile(filePath: string) {

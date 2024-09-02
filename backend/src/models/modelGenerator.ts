@@ -52,9 +52,7 @@ export class ModelGenerator {
   generateRecipes(count = 1): Recipe[] {
     const recipes = Array<Recipe>();
     for (let i = 0; i < count; i++) {
-      const ingredients = [...this.generateIngredient(randomInt(4, 8))].map(
-        toQuantifiedIngredient
-      );
+      const ingredients = this.generateQuantifiedIngredients(randomInt(4, 8));
       recipes.push({
         id: i,
         mealType: (['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)],
@@ -66,6 +64,10 @@ export class ModelGenerator {
       });
     }
     return recipes;
+  }
+
+  generateQuantifiedIngredients(count = 1): QuantifiedIngredient[] {
+    return [...this.generateIngredient(count)].map(toQuantifiedIngredient);
   }
 }
 

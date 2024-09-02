@@ -1,6 +1,5 @@
 import {z} from 'zod';
 
-// Ingredient Schema
 const IngredientSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -11,19 +10,16 @@ const IngredientSchema = z.object({
   fat: z.number(),
 });
 
-// QuantifiedIngredient Schema
 const QuantifiedIngredientSchema = z.object({
   ingredient: IngredientSchema,
   amount: z.number(),
   unit: z.string(),
 });
 
-// Instruction Schema
 const InstructionSchema = z.object({
   description: z.string(),
 });
 
-// Macros Schema
 const MacrosSchema = z.object({
   fat: z.number(),
   carbohydrate: z.number(),
@@ -32,7 +28,6 @@ const MacrosSchema = z.object({
 
 const MealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner']);
 
-// Recipe Schema
 export const RecipeSchema = z.object({
   id: z.number(),
   mealType: MealTypeSchema,
@@ -41,7 +36,6 @@ export const RecipeSchema = z.object({
   instructions: z.array(InstructionSchema),
 });
 
-// Infer the TypeScript type from the zod schema
 export type Recipe = z.infer<typeof RecipeSchema>;
 export type Ingredient = z.infer<typeof IngredientSchema>;
 export type QuantifiedIngredient = z.infer<typeof QuantifiedIngredientSchema>;
