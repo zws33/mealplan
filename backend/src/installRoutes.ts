@@ -1,5 +1,6 @@
 import {Application} from 'express';
+import {recipesRouter} from './routes/recipesRouter';
 
 export function installRoutes(app: Application) {
-  // TODO: Implement routes
+  app.use('/recipes', recipesRouter);
 }

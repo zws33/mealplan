@@ -1,16 +1,44 @@
-import {readFileSync} from 'node:fs';
-import {MealType, Recipe, RecipeInput, RecipeSchema} from '../models/models';
+import {existsSync, readFileSync, writeFileSync} from 'node:fs';
+import {
+  calculateRecipeCalories,
+  getMacros,
+  MealTypeSchema,
+  Recipe,
+  RecipeInput,
+  RecipeSchema,
+} from '../models/models';
+import {ModelGenerator} from '../models/modelGenerator';
+import {z} from 'zod';
 
 export interface RecipeRepository {
   createRecipe(recipe: RecipeInput): Promise<Recipe>;
   getRecipeById(id: number): Promise<Recipe | undefined>;
   updateRecipe(recipe: Recipe): Promise<Recipe>;
   deleteRecipe(id: number): Promise<boolean>;
+  getRecipes(queryParams: GetRecipesQueryParams): Promise<Recipe[]>;
 }
 
+export const GetRecipesQuerySchema = z.object({
+  mealType: MealTypeSchema.optional(),
+  nameIncludes: z.string().optional(),
+  minProtein: z.number().optional(),
+  maxProtein: z.number().optional(),
+  minCalories: z.number().optional(),
+  maxCalories: z.number().optional(),
+  limit: z.number().optional(),
+});
+
+export type GetRecipesQueryParams = z.infer<typeof GetRecipesQuerySchema>;
+
 export class InMemoryRecipeRepository implements RecipeRepository {
-  private recipes: Map<number, Recipe> = new Map();
-  constructor(private readonly filePath: string) {
+  private readonly recipes: Map<number, Recipe> = new Map();
+  private readonly defultLimit = 10;
+
+  constructor(filePathInput: string | undefined) {
+    const filePath = filePathInput || './src/recipeRepository/recipes.json';
+    if (!existsSync(filePath)) {
+      this.initializeTestData(filePath);
+    }
     this.readAndValidateRecipeFile(filePath);
   }
 
@@ -36,11 +64,12 @@ export class InMemoryRecipeRepository implements RecipeRepository {
     return result;
   }
 
-  async getRecipeByMealType(mealType: MealType): Promise<Recipe[]> {
-    const result = [...this.recipes.values()].filter(
-      recipe => recipe.mealType === mealType
-    );
-    return result;
+  async getRecipes(queryParams: GetRecipesQueryParams): Promise<Recipe[]> {
+    const recipes = [...this.recipes.values()];
+    const matchesQueryParams = this.getRecipesFilter(queryParams);
+    return recipes
+      .filter(matchesQueryParams)
+      .slice(0, queryParams.limit || this.defultLimit);
   }
 
   async updateRecipe(recipe: Recipe): Promise<Recipe> {
@@ -71,5 +100,55 @@ export class InMemoryRecipeRepository implements RecipeRepository {
       console.error('Error reading, parsing, or validating recipe file', error);
       throw error;
     }
+  }
+
+  private initializeTestData(filePath: string) {
+    const recipes = new ModelGenerator().generateRecipes(100);
+    const jsonString = JSON.stringify(recipes, null, 2);
+    writeFileSync(filePath, jsonString, 'utf-8');
+    return filePath;
+  }
+
+  private getRecipesFilter(
+    queryParams: GetRecipesQueryParams
+  ): (recipe: Recipe) => boolean {
+    return (recipe: Recipe) => {
+      if (queryParams.mealType && recipe.mealType !== queryParams.mealType) {
+        return false;
+      }
+      if (
+        queryParams.nameIncludes &&
+        !recipe.name
+          .toLowerCase()
+          .includes(queryParams.nameIncludes.toLowerCase())
+      ) {
+        return false;
+      }
+      if (
+        queryParams.minProtein &&
+        getMacros(recipe).protein < queryParams.minProtein
+      ) {
+        return false;
+      }
+      if (
+        queryParams.maxProtein &&
+        getMacros(recipe).protein > queryParams.maxProtein
+      ) {
+        return false;
+      }
+      if (
+        queryParams.minCalories &&
+        calculateRecipeCalories(recipe) < queryParams.minCalories
+      ) {
+        return false;
+      }
+      if (
+        queryParams.maxCalories &&
+        calculateRecipeCalories(recipe) > queryParams.maxCalories
+      ) {
+        return false;
+      }
+      return true;
+    };
   }
 }

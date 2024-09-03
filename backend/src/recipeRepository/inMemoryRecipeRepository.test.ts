@@ -1,7 +1,15 @@
-import {InMemoryRecipeRepository} from './recipeRepository';
+import {
+  GetRecipesQueryParams,
+  InMemoryRecipeRepository,
+} from './recipeRepository';
 import {unlink, writeFileSync} from 'node:fs';
 import {ModelGenerator} from '../models/modelGenerator';
-import {Recipe, RecipeInput} from '../models/models';
+import {
+  calculateRecipeCalories,
+  getMacros,
+  Recipe,
+  RecipeInput,
+} from '../models/models';
 
 describe('InMemoryRecipeRepository', () => {
   let repository: InMemoryRecipeRepository;
@@ -9,7 +17,7 @@ describe('InMemoryRecipeRepository', () => {
   let testRecipes: Recipe[];
   beforeEach(() => {
     testDataPath = './src/recipeRepository/testRecipes.json';
-    testRecipes = new ModelGenerator().generateRecipes(10);
+    testRecipes = new ModelGenerator().generateRecipes(100);
     const jsonString = JSON.stringify(testRecipes, null, 2);
     writeFileSync(testDataPath, jsonString, 'utf-8');
     repository = new InMemoryRecipeRepository(testDataPath);
@@ -20,11 +28,26 @@ describe('InMemoryRecipeRepository', () => {
     expect(actual).toEqual(testRecipes[0]);
   });
 
-  test('getRecipeByMealType returns the correct recipes', async () => {
-    const actual = await repository.getRecipeByMealType('lunch');
-    const lunchRecipes = testRecipes.filter(r => r.mealType === 'lunch');
-    expect(actual.length).toBe(lunchRecipes.length);
-    expect(actual).toEqual(lunchRecipes);
+  test('getRecipes returns the correct recipes', async () => {
+    const queryOptions: GetRecipesQueryParams = {
+      mealType: 'lunch',
+      minProtein: 20,
+      maxProtein: 30,
+      minCalories: 200,
+      maxCalories: 500,
+      limit: 10,
+    };
+    const actual = await repository.getRecipes(queryOptions);
+    expect(actual.length).toBeLessThan(queryOptions.limit!);
+    actual.forEach(recipe => {
+      expect(recipe.mealType).toBe('lunch');
+      const macros = getMacros(recipe);
+      expect(macros.protein).toBeGreaterThanOrEqual(queryOptions.minProtein!);
+      expect(macros.protein).toBeLessThanOrEqual(queryOptions.maxProtein!);
+      const calories = calculateRecipeCalories(recipe);
+      expect(calories).toBeGreaterThanOrEqual(queryOptions.minCalories!);
+      expect(calories).toBeLessThanOrEqual(queryOptions.maxCalories!);
+    });
   });
 
   test('createRecipe should add a new recipe to the repository', async () => {

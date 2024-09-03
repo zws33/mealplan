@@ -1,10 +1,7 @@
-import express, {Application, Request, Response} from 'express';
+import express, {Application} from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import {installRoutes} from './installRoutes';
-import {InMemoryRecipeRepository} from './recipeRepository/recipeRepository';
-import {ModelGenerator} from './models/modelGenerator';
-import {existsSync, writeFileSync} from 'fs';
 
 export function startServer() {
   const app: Application = express();
@@ -15,24 +12,12 @@ export function startServer() {
   };
 
   app.use(cors(corsOptions));
-  app.use(morgan('common'));
+  const logFormat = process.env.NODE_ENV === 'development' ? 'dev' : 'combined';
+  app.use(morgan(logFormat));
   app.use(express.json());
 
   app.get('/', (req, res) => {
     res.send('Hello World!');
-  });
-
-  const filepath = './recipes.json';
-  if (!existsSync(filepath)) {
-    const recipes = new ModelGenerator().generateRecipes(100);
-    const jsonString = JSON.stringify(recipes, null, 2);
-    writeFileSync(filepath, jsonString, 'utf-8');
-  }
-  const repository = new InMemoryRecipeRepository(filepath);
-
-  app.get('/api', async (req, res) => {
-    const recipe = await repository.getRecipeById(96);
-    res.json(recipe);
   });
 
   installRoutes(app);

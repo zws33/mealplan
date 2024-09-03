@@ -26,7 +26,7 @@ const MacrosSchema = z.object({
   protein: z.number(),
 });
 
-const MealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner']);
+export const MealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner']);
 
 export const RecipeSchema = z.object({
   id: z.number(),
