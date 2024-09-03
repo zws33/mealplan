@@ -10,13 +10,6 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Stage 2: Run the app with Nodemon
-FROM node:18-alpine
-WORKDIR /app
-
-COPY --from=builder /app /app
-RUN npm install
-
 # Install nodemon globally
 RUN npm install -g nodemon
 
@@ -26,5 +19,8 @@ EXPOSE 3000
 # Set the environment variable file
 ENV NODE_ENV=development
 
+# Copy nodemon configuration
+COPY nodemon.json .
+
 # Run the app with Nodemon
-CMD ["nodemon", "--watch", "src", "--exec", "npm run dev"]
+CMD ["nodemon", "-L", "--config", "nodemon.json"]

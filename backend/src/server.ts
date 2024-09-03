@@ -1,4 +1,4 @@
-import express, {Application, Request, Response} from 'express';
+import express, {Application} from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import {installRoutes} from './installRoutes';
@@ -12,10 +12,11 @@ export function startServer() {
   };
 
   app.use(cors(corsOptions));
-  app.use(morgan('common'));
+  const logFormat = process.env.NODE_ENV === 'development' ? 'dev' : 'combined';
+  app.use(morgan(logFormat));
   app.use(express.json());
 
-  app.get('/', (req: Request, res: Response) => {
+  app.get('/', (req, res) => {
     res.send('Hello World!');
   });
 

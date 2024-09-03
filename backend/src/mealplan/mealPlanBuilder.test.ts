@@ -4,10 +4,15 @@ import {ModelGenerator} from '../models/modelGenerator';
 
 describe('MealPlanBuilder', () => {
   const mealTypes = ['breakfast', 'lunch', 'dinner'] as const;
-  const numberOfDays = 3;
-  const dailyCalorieLimit = 10000;
-  const desiredProteinPerMeal = 5;
-  const recipes = new ModelGenerator().generateRecipes(100);
+  const numberOfDays = 5;
+  const dailyCalorieLimit = 2000;
+  const desiredProteinPerMeal = 20;
+  const recipeOptions = {
+    protein: {min: 15, max: 25},
+    carbohydrates: {min: 10, max: 30},
+    fat: {min: 10, max: 20},
+  };
+  const recipes = new ModelGenerator(recipeOptions).generateRecipes(1000);
   const meals = recipes.map(recipe => {
     return {
       id: recipe.id,
@@ -38,7 +43,7 @@ describe('MealPlanBuilder', () => {
         (sum, meal) => sum + meal.calories,
         0
       );
-      expect(totalCalories < dailyCalorieLimit).toBe(true);
+      expect(totalCalories / numberOfDays < dailyCalorieLimit).toBe(true);
       const averageProtein =
         result!.reduce((sum, meal) => sum + meal.protein, 0) / result!.length;
       expect(averageProtein).toBeGreaterThanOrEqual(desiredProteinPerMeal);

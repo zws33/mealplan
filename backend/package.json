@@ -10,8 +10,8 @@
     "build": "tsc",
     "fix": "gts fix",
     "watch": "tsc -w",
-    "dev": "npx ts-node ./src/index.ts",
-    "start": "node build/src/index.js"
+    "dev": "nodemon --config nodemon.json",
+    "start": "node build/index.js"
   },
   "engines": {
     "node": ">=14"
