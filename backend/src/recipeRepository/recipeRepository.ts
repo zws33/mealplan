@@ -35,7 +35,7 @@ export class InMemoryRecipeRepository implements RecipeRepository {
   private readonly defultLimit = 10;
 
   constructor(filePathInput: string | undefined) {
-    const filePath = filePathInput || './src/recipeRepository/recipes.json';
+    const filePath = filePathInput || './src/recipeRepository/dev_recipes.json';
     if (!existsSync(filePath)) {
       this.initializeTestData(filePath);
     }
