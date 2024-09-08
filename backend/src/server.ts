@@ -2,8 +2,9 @@ import express, {Application} from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import {installRoutes} from './installRoutes';
+import {initializeDatabase} from './db/postgresDb';
 
-export function startServer() {
+export async function startServer() {
   const app: Application = express();
 
   const corsOptions = {
@@ -20,6 +21,7 @@ export function startServer() {
     res.send('Hello World!');
   });
 
+  await initializeDatabase();
   installRoutes(app);
 
   const PORT = process.env.PORT || 3000;

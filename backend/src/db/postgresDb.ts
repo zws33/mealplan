@@ -7,3 +7,9 @@ export const PostgresDb = new Pool({
   password: process.env.POSTGRES_PASSWORD,
   port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT) : 5432,
 });
+
+export async function initializeDatabase() {
+  await PostgresDb.connect();
+  const test = await PostgresDb.query('SELECT NOW()');
+  console.log(`Db connection: ${test.rows.length > 0 ? 'success' : 'failure'}`);
+}

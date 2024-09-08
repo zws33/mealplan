@@ -2,7 +2,7 @@ import {MealTypeSchema, Recipe, RecipeInput} from '../models/models';
 import {z} from 'zod';
 
 export interface RecipeRepository {
-  createRecipe(recipe: RecipeInput): Promise<Recipe>;
+  createRecipe(recipeInput: RecipeInput): Promise<Recipe>;
   getRecipeById(id: number): Promise<Recipe | undefined>;
   updateRecipe(recipe: Recipe): Promise<Recipe>;
   deleteRecipe(id: number): Promise<boolean>;
