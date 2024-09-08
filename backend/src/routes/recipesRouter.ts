@@ -2,14 +2,13 @@ import {Router} from 'express';
 import {
   GetRecipesQueryParams,
   GetRecipesQuerySchema,
-  InMemoryRecipeRepository,
   RecipeRepository,
 } from '../recipeRepository/recipeRepository';
+import {InMemoryRecipeRepository} from '../recipeRepository/inMemoryRecipeRepository';
 import {ZodError} from 'zod';
 
-const repository: RecipeRepository = new InMemoryRecipeRepository(
-  process.env.FILE_PATH
-);
+const FILE_PATH = process.env.FILE_PATH;
+const repository: RecipeRepository = new InMemoryRecipeRepository(FILE_PATH);
 
 export const recipesRouter = Router();
 

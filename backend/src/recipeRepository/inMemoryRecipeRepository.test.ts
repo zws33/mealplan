@@ -1,7 +1,5 @@
-import {
-  GetRecipesQueryParams,
-  InMemoryRecipeRepository,
-} from './recipeRepository';
+import {GetRecipesQueryParams} from './recipeRepository';
+import {InMemoryRecipeRepository} from './inMemoryRecipeRepository';
 import {unlink, writeFileSync} from 'node:fs';
 import {ModelGenerator} from '../models/modelGenerator';
 import {
