@@ -6,6 +6,8 @@ import {
 } from '../recipeRepository/recipeRepository';
 import {InMemoryRecipeRepository} from '../recipeRepository/inMemoryRecipeRepository';
 import {ZodError} from 'zod';
+import {ModelGenerator} from '../models/modelGenerator';
+import {createRecipe} from '../recipeRepository/postgresIngredientRepository';
 
 const FILE_PATH = process.env.FILE_PATH;
 const repository: RecipeRepository = new InMemoryRecipeRepository(FILE_PATH);
@@ -31,6 +33,14 @@ recipesRouter.get('/', async (req, res) => {
   } else {
     res.json(recipes);
   }
+});
+
+recipesRouter.post('/', async (req, res) => {
+  const recipe = new ModelGenerator().generateRecipes(1);
+  console.log(recipe);
+  const result = await createRecipe(recipe[0]);
+  console.log(result);
+  res.json(result);
 });
 
 recipesRouter.get('/:id', async (req, res) => {
