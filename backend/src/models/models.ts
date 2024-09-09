@@ -1,10 +1,10 @@
 import {z} from 'zod';
 
-const IngredientSchema = z.object({
+export const IngredientSchema = z.object({
   id: z.number(),
   name: z.string(),
   unit: z.string(),
-  servingSize: z.number(),
+  serving_size: z.number(),
   protein: z.number(),
   carbohydrates: z.number(),
   fat: z.number(),
@@ -30,7 +30,7 @@ export const MealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner']);
 
 export const RecipeSchema = z.object({
   id: z.number(),
-  mealType: MealTypeSchema,
+  meal_type: MealTypeSchema,
   name: z.string(),
   ingredients: z.array(QuantifiedIngredientSchema),
   instructions: z.array(InstructionSchema),
@@ -44,6 +44,7 @@ export type Macros = z.infer<typeof MacrosSchema>;
 export type MealType = z.infer<typeof MealTypeSchema>;
 
 export type RecipeInput = Omit<Recipe, 'id'>;
+export type IngredientInput = Omit<Ingredient, 'id'>;
 
 export function calculateRecipeCalories(recipe: Recipe): number {
   const macros = getMacros(recipe);
@@ -69,7 +70,7 @@ function getMacrosForIngredient(
   quantifiedIngredient: QuantifiedIngredient
 ): Macros {
   const {ingredient, amount} = quantifiedIngredient;
-  const multiplier = amount / ingredient.servingSize;
+  const multiplier = amount / ingredient.serving_size;
   return {
     fat: ingredient.fat * multiplier,
     carbohydrate: ingredient.carbohydrates * multiplier,

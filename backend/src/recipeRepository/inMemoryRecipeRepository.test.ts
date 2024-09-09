@@ -38,7 +38,7 @@ describe('InMemoryRecipeRepository', () => {
     const actual = await repository.getRecipes(queryOptions);
     expect(actual.length).toBeLessThan(queryOptions.limit!);
     actual.forEach(recipe => {
-      expect(recipe.mealType).toBe('lunch');
+      expect(recipe.meal_type).toBe('lunch');
       const macros = getMacros(recipe);
       expect(macros.protein).toBeGreaterThanOrEqual(queryOptions.minProtein!);
       expect(macros.protein).toBeLessThanOrEqual(queryOptions.maxProtein!);
@@ -52,7 +52,7 @@ describe('InMemoryRecipeRepository', () => {
     const modelGenerator = new ModelGenerator();
     const recipeInput: RecipeInput = {
       name: 'New Recipe',
-      mealType: 'lunch',
+      meal_type: 'lunch',
       ingredients: modelGenerator.generateQuantifiedIngredients(3),
       instructions: modelGenerator.generateInstructions(2),
     };
@@ -69,7 +69,7 @@ describe('InMemoryRecipeRepository', () => {
     const modelGenerator = new ModelGenerator();
     const existingRecipe: RecipeInput = {
       name: 'New Recipe',
-      mealType: 'lunch',
+      meal_type: 'lunch',
       ingredients: modelGenerator.generateQuantifiedIngredients(3),
       instructions: modelGenerator.generateInstructions(2),
     };

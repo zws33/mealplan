@@ -12,7 +12,7 @@ describe('ModelGenerator', () => {
       expect(ingredient.id).toBeLessThanOrEqual(10000);
       expect(ingredient.name).toBeDefined();
       expect(ingredient.unit).toBe('g');
-      expect(ingredient.servingSize).toBe(100);
+      expect(ingredient.serving_size).toBe(100);
       expect(ingredient.protein).toBeGreaterThanOrEqual(1);
       expect(ingredient.protein).toBeLessThanOrEqual(100);
       expect(ingredient.carbohydrates).toBeGreaterThanOrEqual(1);
@@ -36,7 +36,7 @@ describe('ModelGenerator', () => {
         expect(ingredient.id).toBeLessThanOrEqual(10000);
         expect(ingredient.name).toBeDefined();
         expect(ingredient.unit).toBe('g');
-        expect(ingredient.servingSize).toBe(100);
+        expect(ingredient.serving_size).toBe(100);
         expect(ingredient.protein).toBeGreaterThanOrEqual(1);
         expect(ingredient.protein).toBeLessThanOrEqual(100);
         expect(ingredient.carbohydrates).toBeGreaterThanOrEqual(1);
@@ -72,7 +72,7 @@ describe('ModelGenerator', () => {
     const recipe = recipes[0];
     expect(recipe.id).toBeGreaterThanOrEqual(0);
     expect(recipe.id).toBeLessThanOrEqual(1000);
-    expect(recipe.mealType).toBeDefined();
+    expect(recipe.meal_type).toBeDefined();
     expect(recipe.name).toBeDefined();
     expect(recipe.ingredients).toBeDefined();
     expect(recipe.instructions).toBeDefined();
@@ -86,7 +86,7 @@ describe('ModelGenerator', () => {
     expect(ids.size).toEqual(count);
     recipes.forEach(recipe => {
       expect(recipe).toBeDefined();
-      expect(recipe.mealType).toBeDefined();
+      expect(recipe.meal_type).toBeDefined();
       expect(recipe.name).toBeDefined();
       expect(recipe.ingredients).toBeDefined();
       expect(recipe.instructions).toBeDefined();

@@ -27,7 +27,7 @@ export class ModelGenerator {
         id: randomInt(0, 10000),
         name: textGenerator.generateWords(randomInt(1, 3)),
         unit: 'g',
-        servingSize: 100,
+        serving_size: 100,
         protein: randomInt(this.protein.min, this.protein.max),
         carbohydrates: randomInt(
           this.carbohydrates.min,
@@ -55,7 +55,7 @@ export class ModelGenerator {
       const ingredients = this.generateQuantifiedIngredients(randomInt(4, 8));
       recipes.push({
         id: i,
-        mealType: (['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)],
+        meal_type: (['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)],
         name: textGenerator.generateWords(randomInt(1, 3)),
         ingredients: ingredients,
         instructions: this.generateInstructions(

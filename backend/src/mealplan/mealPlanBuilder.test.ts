@@ -18,7 +18,7 @@ describe('MealPlanBuilder', () => {
       id: recipe.id,
       calories: calculateRecipeCalories(recipe),
       protein: getMacros(recipe).protein,
-      mealType: recipe.mealType,
+      mealType: recipe.meal_type,
     };
   })!;
   const builder = new MealPlanBuilder(meals, {

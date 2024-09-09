@@ -8,6 +8,7 @@ import {
   calculateRecipeCalories,
 } from '../models/models';
 import {RecipeRepository, GetRecipesQueryParams} from './recipeRepository';
+import {ZodError} from 'zod';
 
 export class InMemoryRecipeRepository implements RecipeRepository {
   private readonly recipes: Map<number, Recipe> = new Map();
@@ -66,9 +67,7 @@ export class InMemoryRecipeRepository implements RecipeRepository {
       const fileContent = readFileSync(filePath, 'utf-8');
 
       const recipeData: Recipe[] = JSON.parse(fileContent).map(
-        (recipe: unknown) => {
-          return RecipeSchema.parse(recipe);
-        }
+        (recipe: unknown) => RecipeSchema.parse(recipe)
       );
       recipeData.forEach(recipe => {
         this.recipes.set(recipe.id, recipe);
@@ -76,7 +75,12 @@ export class InMemoryRecipeRepository implements RecipeRepository {
 
       return recipeData;
     } catch (error) {
-      console.error('Error reading, parsing, or validating recipe file', error);
+      if (error instanceof ZodError) {
+        console.error('Error validating recipe file', error.errors);
+      } else {
+        console.error('Error reading recipe file', error);
+      }
+
       throw error;
     }
   }
@@ -92,7 +96,7 @@ export class InMemoryRecipeRepository implements RecipeRepository {
     queryParams: GetRecipesQueryParams
   ): (recipe: Recipe) => boolean {
     return (recipe: Recipe) => {
-      if (queryParams.mealType && recipe.mealType !== queryParams.mealType) {
+      if (queryParams.mealType && recipe.meal_type !== queryParams.mealType) {
         return false;
       }
       if (
