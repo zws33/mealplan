@@ -44,6 +44,7 @@ export type Macros = z.infer<typeof MacrosSchema>;
 export type MealType = z.infer<typeof MealTypeSchema>;
 
 export type RecipeInput = Omit<Recipe, 'id'>;
+export type IngredientInput = Omit<Ingredient, 'id'>;
 
 export function calculateRecipeCalories(recipe: Recipe): number {
   const macros = getMacros(recipe);
