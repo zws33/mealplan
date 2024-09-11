@@ -31,8 +31,8 @@ CREATE TABLE recipe_ingredient (
     unit VARCHAR(50) NOT NULL,
     quantity DECIMAL(10, 2) NOT NULL,
     PRIMARY KEY (recipe_id, ingredient_id),
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-    FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE
+    FOREIGN KEY (recipe_id) REFERENCES recipe(id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredient_id) REFERENCES ingredient(id) ON DELETE CASCADE
 );
 
 
@@ -41,5 +41,5 @@ CREATE TABLE recipe_instruction (
     recipe_id INT NOT NULL,
     step_number INT NOT NULL,
     description TEXT NOT NULL,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+    FOREIGN KEY (recipe_id) REFERENCES recipe(id) ON DELETE CASCADE
 );
