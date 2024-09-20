@@ -18,7 +18,7 @@ describe('MealPlanBuilder', () => {
       id: recipe.id,
       calories: calculateRecipeCalories(recipe),
       protein: getMacros(recipe).protein,
-      mealType: recipe.meal_type,
+      tags: recipe.tags,
     };
   })!;
   const builder = new MealPlanBuilder(meals, {
@@ -38,7 +38,7 @@ describe('MealPlanBuilder', () => {
       const result = mealPlan.get(mealType);
       expect(result).toBeDefined();
       expect(result!.length).toBe(numberOfDays);
-      expect(result!.every(meal => meal.mealType === mealType)).toBe(true);
+      expect(result!.every(meal => meal.tags.includes(mealType))).toBe(true);
       const totalCalories = result!.reduce(
         (sum, meal) => sum + meal.calories,
         0

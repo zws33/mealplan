@@ -43,6 +43,7 @@ export class ModelGenerator {
     const instructions: Instruction[] = [];
     for (let i = 0; i < count; i++) {
       instructions.push({
+        step: i,
         description: textGenerator.generateSentences(1),
       });
     }
@@ -55,7 +56,7 @@ export class ModelGenerator {
       const ingredients = this.generateQuantifiedIngredients(randomInt(4, 8));
       recipes.push({
         id: i,
-        meal_type: (['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)],
+        tags: [(['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)]],
         name: textGenerator.generateWords(randomInt(1, 3)),
         ingredients: ingredients,
         instructions: this.generateInstructions(
@@ -88,6 +89,6 @@ function toQuantifiedIngredient(ingredient: Ingredient): QuantifiedIngredient {
   return {
     unit: 'g',
     ingredient: ingredient,
-    amount: randomInt(1, 100),
+    quantity: randomInt(1, 100),
   };
 }

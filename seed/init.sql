@@ -1,8 +1,9 @@
 -- init.sql
-DROP TABLE IF EXISTS recipe_instructions;
-DROP TABLE IF EXISTS recipe_ingredients;
-DROP TABLE IF EXISTS ingredients;
-DROP TABLE IF EXISTS recipes;
+DROP TABLE IF EXISTS recipe_instruction;
+DROP TABLE IF EXISTS recipe_ingredient;
+DROP TABLE IF EXISTS recipe_tag;
+DROP TABLE IF EXISTS ingredient CASCADE;
+DROP TABLE IF EXISTS recipe CASCADE;
 
 CREATE TABLE recipe (
     id SERIAL PRIMARY KEY,
@@ -22,7 +23,8 @@ CREATE TABLE ingredient (
     unit VARCHAR(50) NOT NULL,
     fat DECIMAL(10, 2) NOT NULL,
     carbohydrates DECIMAL(10, 2) NOT NULL,
-    protein DECIMAL(10, 2) NOT NULL
+    protein DECIMAL(10, 2) NOT NULL,
+    serving_size INT NOT NULL
 );
 
 CREATE TABLE recipe_ingredient (
@@ -31,8 +33,8 @@ CREATE TABLE recipe_ingredient (
     unit VARCHAR(50) NOT NULL,
     quantity DECIMAL(10, 2) NOT NULL,
     PRIMARY KEY (recipe_id, ingredient_id),
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
-    FOREIGN KEY (ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE
+    FOREIGN KEY (recipe_id) REFERENCES recipe(id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredient_id) REFERENCES ingredient(id) ON DELETE CASCADE
 );
 
 
@@ -41,5 +43,5 @@ CREATE TABLE recipe_instruction (
     recipe_id INT NOT NULL,
     step_number INT NOT NULL,
     description TEXT NOT NULL,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+    FOREIGN KEY (recipe_id) REFERENCES recipe(id) ON DELETE CASCADE
 );

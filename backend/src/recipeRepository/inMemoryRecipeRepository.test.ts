@@ -28,7 +28,7 @@ describe('InMemoryRecipeRepository', () => {
 
   test('getRecipes returns the correct recipes', async () => {
     const queryOptions: GetRecipesQueryParams = {
-      mealType: 'lunch',
+      tags: ['lunch'],
       minProtein: 20,
       maxProtein: 30,
       minCalories: 200,
@@ -38,7 +38,7 @@ describe('InMemoryRecipeRepository', () => {
     const actual = await repository.getRecipes(queryOptions);
     expect(actual.length).toBeLessThan(queryOptions.limit!);
     actual.forEach(recipe => {
-      expect(recipe.meal_type).toBe('lunch');
+      expect(recipe.tags).toBe('lunch');
       const macros = getMacros(recipe);
       expect(macros.protein).toBeGreaterThanOrEqual(queryOptions.minProtein!);
       expect(macros.protein).toBeLessThanOrEqual(queryOptions.maxProtein!);
@@ -52,7 +52,7 @@ describe('InMemoryRecipeRepository', () => {
     const modelGenerator = new ModelGenerator();
     const recipeInput: RecipeInput = {
       name: 'New Recipe',
-      meal_type: 'lunch',
+      tags: ['lunch'],
       ingredients: modelGenerator.generateQuantifiedIngredients(3),
       instructions: modelGenerator.generateInstructions(2),
     };
@@ -69,7 +69,7 @@ describe('InMemoryRecipeRepository', () => {
     const modelGenerator = new ModelGenerator();
     const existingRecipe: RecipeInput = {
       name: 'New Recipe',
-      meal_type: 'lunch',
+      tags: ['lunch'],
       ingredients: modelGenerator.generateQuantifiedIngredients(3),
       instructions: modelGenerator.generateInstructions(2),
     };

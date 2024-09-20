@@ -1,4 +1,3 @@
-import {Client, PoolClient} from 'pg';
 import {PostgresDb} from '../db/postgresDb';
 import {
   Ingredient,
@@ -11,25 +10,41 @@ export async function createRecipe(recipeInput: RecipeInput) {
   const client = await PostgresDb.connect();
   try {
     await client.query('BEGIN');
-    const recipeResult = await client.query(
+    const recipeResult = await client.query<{id: number; name: string}>(
       `INSERT INTO recipe (name) 
       VALUES ($1) 
       RETURNING *`,
       [recipeInput.name]
     );
-    const ingredientIds: number[] = [];
     for (const quantifiedIngredient of recipeInput.ingredients) {
-      const ingredientId = await insertIngredient(
-        client,
-        quantifiedIngredient.ingredient
+      await client.query(
+        `INSERT INTO recipe_ingredient (recipe_id, ingredient_id, quantity, unit) 
+        VALUES ($1, $2, $3, $4)`,
+        [
+          recipeResult.rows[0].id,
+          quantifiedIngredient.ingredient.id,
+          quantifiedIngredient.quantity,
+          quantifiedIngredient.unit,
+        ]
       );
-      ingredientIds.push(ingredientId);
     }
-    console.log(ingredientIds);
+    for (const instruction of recipeInput.instructions) {
+      await client.query(
+        `INSERT INTO recipe_instruction (recipe_id, step_number, description) 
+        VALUES ($1, $2, $3)`,
+        [recipeResult.rows[0].id, instruction.step, instruction.description]
+      );
+    }
+    for (const tag of recipeInput.tags) {
+      await client.query(
+        `INSERT INTO recipe_tag (recipe_id, tag) 
+        VALUES ($1, $2)`,
+        [recipeResult.rows[0].id, tag]
+      );
+    }
     client.query('COMMIT');
     return {
       recipe: recipeResult.rows[0],
-      ingredients: ingredientIds,
     };
   } catch (e) {
     client.query('ROLLBACK');
@@ -37,37 +52,6 @@ export async function createRecipe(recipeInput: RecipeInput) {
   } finally {
     client.release();
   }
-}
-
-export async function insertIngredient(
-  client: PoolClient,
-  ingredient: IngredientInput
-): Promise<number> {
-  const insertIngredientQuery = `
-  WITH existing_ingredient AS (
-    -- Check if the ingredient exists
-    SELECT id FROM ingredient WHERE name = $1
-  ),
-  inserted_ingredient AS (
-    -- If not, insert it and return the new ID
-    INSERT INTO ingredient (name, fat, carbohydrates, protein, serving_size, unit)
-    VALUES ($1, $2, $3, $4, $5, $6)
-    ON CONFLICT (name) DO NOTHING
-    RETURNING id
-  )
-  SELECT id FROM existing_ingredient
-  UNION ALL
-  SELECT id FROM inserted_ingredient;`;
-  const result = await client.query(insertIngredientQuery, [
-    ingredient.name,
-    ingredient.fat,
-    ingredient.carbohydrates,
-    ingredient.protein,
-    ingredient.serving_size,
-    ingredient.unit,
-  ]);
-  console.log(result.rows);
-  return result.rows.map(row => row.id)[0];
 }
 
 export async function getRecipeById(id: number) {
@@ -78,11 +62,11 @@ export async function getRecipeById(id: number) {
   return result.rows[0];
 }
 
-export async function createIngredient(ingredient: IngredientInput) {
-  const result = await PostgresDb.query<Ingredient>(
+export async function insertIngredient(db: DB, ingredient: IngredientInput) {
+  const result = await db.query<Ingredient>(
     `INSERT INTO ingredient (name, fat, carbohydrates, protein, serving_size, unit) 
-    VALUES ($1, $2, $3, $4, $5, $6) 
-    RETURNING *`,
+      VALUES ($1, $2, $3, $4, $5, $6) 
+      RETURNING *`,
     [
       ingredient.name,
       ingredient.fat,
@@ -92,7 +76,7 @@ export async function createIngredient(ingredient: IngredientInput) {
       ingredient.unit,
     ]
   );
-  return result;
+  return result.rows[0];
 }
 
 export async function getIngredientById(id: number) {
@@ -111,4 +95,8 @@ export async function getIngredientById(id: number) {
     };
   });
   return result.rows[0];
+}
+
+interface DB {
+  query<T>(query: string, values?: any[]): Promise<{rows: T[]}>;
 }

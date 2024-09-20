@@ -1,15 +1,14 @@
-import {MealType} from '../models/models';
-import {groupBy} from '../util';
+import {MealTag} from '../models/models';
 
 type Meal = {
   id: number;
   calories: number;
   protein: number;
-  mealType: MealType;
+  tags: MealTag[];
 };
 
 export class MealPlanBuilder {
-  groupedMeals: Map<MealType, Meal[]>;
+  availableMeals: Meal[];
   mealCount: number;
   calorieLimit: number;
   desiredProteinPerMeal: number;
@@ -21,19 +20,27 @@ export class MealPlanBuilder {
       desiredProteinPerMeal: number;
     }
   ) {
-    this.groupedMeals = groupBy(availableMeals, meal => meal.mealType);
+    this.availableMeals = availableMeals;
     this.mealCount = constraints.numberOfDays;
     this.calorieLimit =
       (constraints.dailyCalorieLimit * constraints.numberOfDays) / 3;
     this.desiredProteinPerMeal = constraints.desiredProteinPerMeal;
   }
 
-  buildMealPlan(): Map<MealType, Meal[]> {
-    const mealPlan = new Map<MealType, Meal[]>();
-    for (const mealType of this.groupedMeals.keys()) {
-      const meals = this.backtrack(this.groupedMeals.get(mealType)!);
-      mealPlan.set(mealType, meals ? meals : []);
-    }
+  buildMealPlan(): Map<MealTag, Meal[]> {
+    const mealPlan = new Map<MealTag, Meal[]>();
+    const breakfast = this.availableMeals.filter(meal =>
+      meal.tags.includes('breakfast')
+    );
+    const lunch = this.availableMeals.filter(meal =>
+      meal.tags.includes('lunch')
+    );
+    const dinner = this.availableMeals.filter(meal =>
+      meal.tags.includes('dinner')
+    );
+    mealPlan.set('breakfast', this.backtrack(breakfast) || []);
+    mealPlan.set('lunch', this.backtrack(lunch) || []);
+    mealPlan.set('dinner', this.backtrack(dinner) || []);
     return mealPlan;
   }
 

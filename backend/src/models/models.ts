@@ -12,11 +12,12 @@ export const IngredientSchema = z.object({
 
 const QuantifiedIngredientSchema = z.object({
   ingredient: IngredientSchema,
-  amount: z.number(),
+  quantity: z.number(),
   unit: z.string(),
 });
 
 const InstructionSchema = z.object({
+  step: z.number(),
   description: z.string(),
 });
 
@@ -26,11 +27,11 @@ const MacrosSchema = z.object({
   protein: z.number(),
 });
 
-export const MealTypeSchema = z.enum(['breakfast', 'lunch', 'dinner']);
+export const MealTagSchema = z.enum(['breakfast', 'lunch', 'dinner']);
 
 export const RecipeSchema = z.object({
   id: z.number(),
-  meal_type: MealTypeSchema,
+  tags: MealTagSchema.array(),
   name: z.string(),
   ingredients: z.array(QuantifiedIngredientSchema),
   instructions: z.array(InstructionSchema),
@@ -41,7 +42,7 @@ export type Ingredient = z.infer<typeof IngredientSchema>;
 export type QuantifiedIngredient = z.infer<typeof QuantifiedIngredientSchema>;
 export type Instruction = z.infer<typeof InstructionSchema>;
 export type Macros = z.infer<typeof MacrosSchema>;
-export type MealType = z.infer<typeof MealTypeSchema>;
+export type MealTag = z.infer<typeof MealTagSchema>;
 
 export type RecipeInput = Omit<Recipe, 'id'>;
 export type IngredientInput = Omit<Ingredient, 'id'>;
@@ -69,8 +70,8 @@ export function getMacros(recipe: Recipe): Macros {
 function getMacrosForIngredient(
   quantifiedIngredient: QuantifiedIngredient
 ): Macros {
-  const {ingredient, amount} = quantifiedIngredient;
-  const multiplier = amount / ingredient.serving_size;
+  const {ingredient, quantity} = quantifiedIngredient;
+  const multiplier = quantity / ingredient.serving_size;
   return {
     fat: ingredient.fat * multiplier,
     carbohydrate: ingredient.carbohydrates * multiplier,

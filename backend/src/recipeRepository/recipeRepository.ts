@@ -1,4 +1,4 @@
-import {MealTypeSchema, Recipe, RecipeInput} from '../models/models';
+import {MealTagSchema, Recipe, RecipeInput} from '../models/models';
 import {z} from 'zod';
 
 export interface RecipeRepository {
@@ -10,7 +10,7 @@ export interface RecipeRepository {
 }
 
 export const GetRecipesQuerySchema = z.object({
-  mealType: MealTypeSchema.optional(),
+  tags: MealTagSchema.array().optional(),
   nameIncludes: z.string().optional(),
   minProtein: z.number().optional(),
   maxProtein: z.number().optional(),

@@ -96,7 +96,10 @@ export class InMemoryRecipeRepository implements RecipeRepository {
     queryParams: GetRecipesQueryParams
   ): (recipe: Recipe) => boolean {
     return (recipe: Recipe) => {
-      if (queryParams.mealType && recipe.meal_type !== queryParams.mealType) {
+      if (
+        queryParams.tags &&
+        !queryParams.tags.some(tag => recipe.tags.includes(tag))
+      ) {
         return false;
       }
       if (
