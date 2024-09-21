@@ -1,10 +1,6 @@
 import {Router} from 'express';
 import {Ingredient, IngredientSchema} from '../models/models';
-import {
-  insertIngredient,
-  getIngredientById,
-} from '../recipeRepository/postgresIngredientRepository';
-import {PostgresDb} from '../db/postgresDb';
+import {repository} from '../recipeRepository/postgresIngredientRepository';
 
 export const ingredientsRouter = Router();
 
@@ -12,7 +8,7 @@ ingredientsRouter.post('/', async (req, res) => {
   const inputSchema = IngredientSchema.omit({id: true});
   const ingredientInput = inputSchema.parse(req.body);
   try {
-    const result = await insertIngredient(PostgresDb, ingredientInput);
+    const result = await repository.insertIngredient(ingredientInput);
     res.status(200).json(result);
   } catch (error) {
     res.status(400).send('Bad request');
@@ -28,7 +24,7 @@ ingredientsRouter.post('/seed', async (req, res) => {
   try {
     const results: Ingredient[] = [];
     for (const ingredient of input) {
-      const result = await insertIngredient(PostgresDb, ingredient);
+      const result = await repository.insertIngredient(ingredient);
       results.push(result);
     }
     res.status(200).json(results);
@@ -40,6 +36,6 @@ ingredientsRouter.post('/seed', async (req, res) => {
 
 ingredientsRouter.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id);
-  const result = await getIngredientById(id);
+  const result: Ingredient = await repository.getIngredientById(id);
   res.json(result);
 });

@@ -7,10 +7,10 @@ import {
   getMacros,
   calculateRecipeCalories,
 } from '../models/models';
-import {RecipeRepository, GetRecipesQueryParams} from './recipeRepository';
+import {GetRecipesQueryParams} from './recipeRepository';
 import {ZodError} from 'zod';
 
-export class InMemoryRecipeRepository implements RecipeRepository {
+export class InMemoryRecipeRepository {
   private readonly recipes: Map<number, Recipe> = new Map();
   private readonly defultLimit = 10;
 
@@ -22,7 +22,7 @@ export class InMemoryRecipeRepository implements RecipeRepository {
     this.readAndValidateRecipeFile(filePath);
   }
 
-  async createRecipe(recipeInput: RecipeInput): Promise<Recipe> {
+  async createRecipe(recipeInput: RecipeInput) {
     if (
       [...this.recipes.values()]
         .map(recipe => recipe.name)
@@ -36,7 +36,12 @@ export class InMemoryRecipeRepository implements RecipeRepository {
       ...recipeInput,
     };
     this.recipes.set(id, newRecipe);
-    return newRecipe;
+    return {
+      recipe: {
+        id,
+        name: recipeInput.name,
+      },
+    };
   }
 
   async getRecipeById(id: number): Promise<Recipe | undefined> {

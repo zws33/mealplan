@@ -57,12 +57,10 @@ describe('InMemoryRecipeRepository', () => {
       instructions: modelGenerator.generateInstructions(2),
     };
 
-    const createdRecipe = await repository.createRecipe(recipeInput);
+    const result = await repository.createRecipe(recipeInput);
 
-    expect(createdRecipe.id).toBeDefined();
-    expect(createdRecipe.name).toBe(recipeInput.name);
-    expect(createdRecipe.ingredients).toEqual(recipeInput.ingredients);
-    expect(createdRecipe.instructions).toBe(recipeInput.instructions);
+    expect(result.recipe.id).toBeDefined();
+    expect(result.recipe.name).toBe(recipeInput.name);
   });
 
   test('createRecipe should throw an error if a recipe with the same name already exists', async () => {

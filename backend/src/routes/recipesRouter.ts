@@ -2,15 +2,10 @@ import {Router} from 'express';
 import {
   GetRecipesQueryParams,
   GetRecipesQuerySchema,
-  RecipeRepository,
 } from '../recipeRepository/recipeRepository';
-import {InMemoryRecipeRepository} from '../recipeRepository/inMemoryRecipeRepository';
 import {ZodError} from 'zod';
-import {createRecipe} from '../recipeRepository/postgresIngredientRepository';
+import {repository} from '../recipeRepository/postgresIngredientRepository';
 import {RecipeSchema} from '../models/models';
-
-const FILE_PATH = process.env.FILE_PATH;
-const repository: RecipeRepository = new InMemoryRecipeRepository(FILE_PATH);
 
 export const recipesRouter = Router();
 
@@ -38,7 +33,7 @@ recipesRouter.get('/', async (req, res) => {
 recipesRouter.post('/', async (req, res) => {
   const recipe = RecipeSchema.omit({id: true}).parse(req.body);
   try {
-    const result = await createRecipe(recipe);
+    const result = await repository.createRecipe(recipe);
     res.json(result);
   } catch (error) {
     console.log(error);
