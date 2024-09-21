@@ -10,7 +10,7 @@ import {
 import {GetRecipesQueryParams} from './recipeRepository';
 import {ZodError} from 'zod';
 
-export class InMemoryRecipeRepository {
+export class InMemoryRepository {
   private readonly recipes: Map<number, Recipe> = new Map();
   private readonly defultLimit = 10;
 

@@ -5,7 +5,6 @@ import {
   IngredientInput,
   Recipe,
   RecipeInput,
-  RecipeSchema,
 } from '../models/models';
 import {GetRecipesQueryParams, Repository} from './recipeRepository';
 import {readFileSync} from 'fs';
@@ -74,24 +73,34 @@ export class PostgresRepository implements Repository {
       throw new Error('Recipe not found');
     }
     const ingredientRows = await this.db.query(
-      `SELECT *
-        FROM recipe_ingredient ri
-        JOIN ingredient i ON ri.ingredient_id = i.id
-        WHERE ri.recipe_id = $1;`,
+      `SELECT 
+        ri.unit AS recipe_unit,
+        ri.quantity AS recipe_quantity,
+        i.id,
+        i.name,
+        i.unit,
+        i.serving_size,
+        i.carbohydrates,
+        i.protein,
+        i.fat
+
+      FROM recipe_ingredient ri
+      JOIN ingredient i ON ri.ingredient_id = i.id
+      WHERE ri.recipe_id = $1;`,
       [id]
     );
     const quantifiedIngredients = ingredientRows.rows.map(row => {
       return {
-        unit: row.unit,
-        quantity: row.quantity,
+        unit: row.recipe_unit,
+        quantity: row.recipe_quantity,
         ingredient: {
-          id: row.ingredient_id,
+          id: row.id,
           name: row.name,
           unit: row.unit,
-          fat: row.fat,
-          carbohydrates: row.carbohydrates,
-          protein: row.protein,
           serving_size: row.serving_size,
+          carbohydrates: parseFloat(row.carbohydrates),
+          protein: parseFloat(row.protein),
+          fat: parseFloat(row.fat),
         },
       };
     });
@@ -118,18 +127,22 @@ export class PostgresRepository implements Repository {
       tags: tagRows.rows.map(row => row.tag),
     };
   }
+
   updateRecipe(recipe: Recipe): Promise<Recipe> {
     throw new Error('Method not implemented.');
   }
+
   async deleteRecipe(id: number): Promise<boolean> {
     const result = await this.db.query('DELETE FROM recipe WHERE id = $1', [
       id,
     ]);
     return result.rows[0];
   }
+
   async getRecipes(queryParams: GetRecipesQueryParams): Promise<Recipe[]> {
     throw new Error('Method not implemented.');
   }
+
   async insertIngredient(ingredient: IngredientInput): Promise<Ingredient> {
     const result = await PostgresDb.query<Ingredient>(
       `INSERT INTO ingredient (name, fat, carbohydrates, protein, serving_size, unit) 
@@ -146,19 +159,20 @@ export class PostgresRepository implements Repository {
     );
     return result.rows[0];
   }
+
   async getIngredientById(id: number): Promise<Ingredient> {
-    const result = await PostgresDb.query<Ingredient>(
+    const result = await PostgresDb.query(
       'SELECT * FROM ingredient WHERE id = $1',
       [id]
     );
     result.rows.map(ingredient => {
       return {
         name: ingredient.name,
-        fat: ingredient.fat,
-        carbohydrates: ingredient.carbohydrates,
-        protein: ingredient.protein,
         serving_size: ingredient.serving_size,
         unit: ingredient.unit,
+        carbohydrates: parseFloat(ingredient.carbohydrates),
+        fat: parseFloat(ingredient.fat),
+        protein: parseFloat(ingredient.protein),
       };
     });
     return result.rows[0];

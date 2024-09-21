@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import {Ingredient, IngredientSchema} from '../models/models';
-import {repository} from '../recipeRepository/postgresIngredientRepository';
+import {repository} from '../recipeRepository/postgresRepository';
 
 export const ingredientsRouter = Router();
 

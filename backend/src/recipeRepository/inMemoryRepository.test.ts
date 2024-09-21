@@ -1,5 +1,5 @@
 import {GetRecipesQueryParams} from './recipeRepository';
-import {InMemoryRecipeRepository} from './inMemoryRecipeRepository';
+import {InMemoryRepository} from './inMemoryRepository';
 import {unlink, writeFileSync} from 'node:fs';
 import {ModelGenerator} from '../models/modelGenerator';
 import {
@@ -10,7 +10,7 @@ import {
 } from '../models/models';
 
 describe('InMemoryRecipeRepository', () => {
-  let repository: InMemoryRecipeRepository;
+  let repository: InMemoryRepository;
   let testDataPath: string;
   let testRecipes: Recipe[];
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe('InMemoryRecipeRepository', () => {
     testRecipes = new ModelGenerator().generateRecipes(100);
     const jsonString = JSON.stringify(testRecipes, null, 2);
     writeFileSync(testDataPath, jsonString, 'utf-8');
-    repository = new InMemoryRecipeRepository(testDataPath);
+    repository = new InMemoryRepository(testDataPath);
   });
 
   test('getRecipeById returns the correct recipe', async () => {
@@ -37,8 +37,8 @@ describe('InMemoryRecipeRepository', () => {
     };
     const actual = await repository.getRecipes(queryOptions);
     expect(actual.length).toBeLessThan(queryOptions.limit!);
-    actual.forEach(recipe => {
-      expect(recipe.tags).toBe('lunch');
+    actual.forEach((recipe: Recipe) => {
+      expect(recipe.tags).toContain('lunch');
       const macros = getMacros(recipe);
       expect(macros.protein).toBeGreaterThanOrEqual(queryOptions.minProtein!);
       expect(macros.protein).toBeLessThanOrEqual(queryOptions.maxProtein!);
