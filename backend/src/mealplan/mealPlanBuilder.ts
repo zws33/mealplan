@@ -1,10 +1,10 @@
-import {MealTag} from '../models/models';
+import {RecipeTag} from '../models/models';
 
 type Meal = {
   id: number;
   calories: number;
   protein: number;
-  tags: MealTag[];
+  tags: RecipeTag[];
 };
 
 export class MealPlanBuilder {
@@ -27,8 +27,8 @@ export class MealPlanBuilder {
     this.desiredProteinPerMeal = constraints.desiredProteinPerMeal;
   }
 
-  buildMealPlan(): Map<MealTag, Meal[]> {
-    const mealPlan = new Map<MealTag, Meal[]>();
+  buildMealPlan(): Map<RecipeTag, Meal[]> {
+    const mealPlan = new Map<RecipeTag, Meal[]>();
     const breakfast = this.availableMeals.filter(meal =>
       meal.tags.includes('breakfast')
     );

@@ -1,32 +1,28 @@
 import {
   Ingredient,
   IngredientInput,
-  MealTagSchema,
   Recipe,
   RecipeInput,
+  RecipeTag,
 } from '../models/models';
-import {z} from 'zod';
 
 export interface Repository {
   createRecipe(
     recipeInput: RecipeInput
   ): Promise<{recipe: {id: number; name: string}}>;
   getRecipeById(id: number): Promise<Recipe | undefined>;
-  getRecipes(queryParams: GetRecipesQueryParams): Promise<Recipe[]>;
+  getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]>;
   updateRecipe(recipe: Recipe): Promise<Recipe>;
   deleteRecipe(id: number): Promise<boolean>;
   insertIngredient(ingredient: IngredientInput): Promise<Ingredient>;
   getIngredientById(id: number): Promise<Ingredient>;
 }
-
-export const GetRecipesQuerySchema = z.object({
-  tags: MealTagSchema.array().optional(),
-  nameIncludes: z.string().optional(),
-  minProtein: z.number().optional(),
-  maxProtein: z.number().optional(),
-  minCalories: z.number().optional(),
-  maxCalories: z.number().optional(),
-  limit: z.number().optional(),
-});
-
-export type GetRecipesQueryParams = z.infer<typeof GetRecipesQuerySchema>;
+export type RecipeRequestParams = {
+  tags?: RecipeTag[] | undefined;
+  nameIncludes?: string | undefined;
+  minProtein?: number | undefined;
+  maxProtein?: number | undefined;
+  minCalories?: number | undefined;
+  maxCalories?: number | undefined;
+  limit?: number | undefined;
+};

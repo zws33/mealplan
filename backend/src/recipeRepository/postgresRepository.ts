@@ -6,7 +6,7 @@ import {
   Recipe,
   RecipeInput,
 } from '../models/models';
-import {GetRecipesQueryParams, Repository} from './recipeRepository';
+import {RecipeRequestParams, Repository} from './recipeRepository';
 import {readFileSync} from 'fs';
 
 export class PostgresRepository implements Repository {
@@ -69,8 +69,8 @@ export class PostgresRepository implements Repository {
       'SELECT name FROM recipe WHERE id = $1',
       [id]
     );
-    if (!recipeName.rows[0]) {
-      throw new Error('Recipe not found');
+    if (!recipeName.rows.length) {
+      return undefined;
     }
     const ingredientRows = await this.db.query(
       `SELECT 
@@ -139,7 +139,7 @@ export class PostgresRepository implements Repository {
     return result.rows[0];
   }
 
-  async getRecipes(queryParams: GetRecipesQueryParams): Promise<Recipe[]> {
+  async getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {
     throw new Error('Method not implemented.');
   }
 

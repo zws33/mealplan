@@ -3,12 +3,12 @@ import {ModelGenerator} from '../models/modelGenerator';
 import {
   Recipe,
   RecipeInput,
-  RecipeSchema,
   getMacros,
   calculateRecipeCalories,
 } from '../models/models';
-import {GetRecipesQueryParams} from './recipeRepository';
+import {RecipeRequestParams} from './recipeRepository';
 import {ZodError} from 'zod';
+import {RecipeSchema} from '../models/validators';
 
 export class InMemoryRepository {
   private readonly recipes: Map<number, Recipe> = new Map();
@@ -49,7 +49,7 @@ export class InMemoryRepository {
     return result;
   }
 
-  async getRecipes(queryParams: GetRecipesQueryParams): Promise<Recipe[]> {
+  async getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {
     const recipes = [...this.recipes.values()];
     const matchesQueryParams = this.getRecipesFilter(queryParams);
     return recipes
@@ -98,7 +98,7 @@ export class InMemoryRepository {
   }
 
   private getRecipesFilter(
-    queryParams: GetRecipesQueryParams
+    queryParams: RecipeRequestParams
   ): (recipe: Recipe) => boolean {
     return (recipe: Recipe) => {
       if (

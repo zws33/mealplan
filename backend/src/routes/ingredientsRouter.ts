@@ -1,36 +1,27 @@
 import {Router} from 'express';
-import {Ingredient, IngredientSchema} from '../models/models';
+import {Ingredient} from '../models/models';
 import {repository} from '../recipeRepository/postgresRepository';
+import {IngredientSchema} from '../models/validators';
+import {DatabaseError} from 'pg';
+import {ZodError} from 'zod';
 
 export const ingredientsRouter = Router();
 
 ingredientsRouter.post('/', async (req, res) => {
   const inputSchema = IngredientSchema.omit({id: true});
-  const ingredientInput = inputSchema.parse(req.body);
   try {
+    const ingredientInput = inputSchema.parse(req.body);
     const result = await repository.insertIngredient(ingredientInput);
     res.status(200).json(result);
   } catch (error) {
-    res.status(400).send('Bad request');
-    return;
-  }
-});
-
-ingredientsRouter.post('/seed', async (req, res) => {
-  const inputSchema = IngredientSchema.omit({id: true});
-  const input: Ingredient[] = req.body.ingredients.map((ingredient: unknown) =>
-    inputSchema.parse(ingredient)
-  );
-  try {
-    const results: Ingredient[] = [];
-    for (const ingredient of input) {
-      const result = await repository.insertIngredient(ingredient);
-      results.push(result);
+    if (error instanceof ZodError) {
+      res.status(422).json({error: error});
+    } else if (error instanceof DatabaseError) {
+      console.error(error);
+      res.status(409).send('Database conflict');
+    } else {
+      res.status(500).send('Internal server error');
     }
-    res.status(200).json(results);
-  } catch (error) {
-    res.status(400).send('Bad request');
-    return;
   }
 });
 

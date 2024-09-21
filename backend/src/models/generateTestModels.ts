@@ -1,7 +1,7 @@
 import {writeFileSync} from 'fs';
 import {ModelGenerator} from './modelGenerator';
 
-(async () => {
+async function main() {
   const filePath = process.argv[2];
   const count = parseInt(process.argv[3], 10) || 10;
   const recipes = new ModelGenerator().generateRecipes(count);
@@ -12,4 +12,5 @@ import {ModelGenerator} from './modelGenerator';
   } catch (error) {
     console.error('Error writing JSON to file:', error);
   }
-})();
+}
+main();

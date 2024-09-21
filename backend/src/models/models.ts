@@ -1,48 +1,34 @@
-import {z} from 'zod';
-
-export const IngredientSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  unit: z.string(),
-  serving_size: z.number(),
-  protein: z.number(),
-  carbohydrates: z.number(),
-  fat: z.number(),
-});
-
-const QuantifiedIngredientSchema = z.object({
-  ingredient: IngredientSchema,
-  quantity: z.number(),
-  unit: z.string(),
-});
-
-const InstructionSchema = z.object({
-  step: z.number(),
-  description: z.string(),
-});
-
-const MacrosSchema = z.object({
-  fat: z.number(),
-  carbohydrate: z.number(),
-  protein: z.number(),
-});
-
-export const MealTagSchema = z.enum(['breakfast', 'lunch', 'dinner']);
-
-export const RecipeSchema = z.object({
-  id: z.number(),
-  tags: MealTagSchema.array(),
-  name: z.string(),
-  ingredients: z.array(QuantifiedIngredientSchema),
-  instructions: z.array(InstructionSchema),
-});
-
-export type Recipe = z.infer<typeof RecipeSchema>;
-export type Ingredient = z.infer<typeof IngredientSchema>;
-export type QuantifiedIngredient = z.infer<typeof QuantifiedIngredientSchema>;
-export type Instruction = z.infer<typeof InstructionSchema>;
-export type Macros = z.infer<typeof MacrosSchema>;
-export type MealTag = z.infer<typeof MealTagSchema>;
+export type Recipe = {
+  id: number;
+  name: string;
+  tags: RecipeTag[];
+  ingredients: QuantifiedIngredient[];
+  instructions: Instruction[];
+};
+export type QuantifiedIngredient = {
+  unit: string;
+  ingredient: Ingredient;
+  quantity: number;
+};
+export type Ingredient = {
+  id: number;
+  name: string;
+  unit: string;
+  serving_size: number;
+  protein: number;
+  carbohydrates: number;
+  fat: number;
+};
+export type Instruction = {
+  step: number;
+  description: string;
+};
+export type RecipeTag = 'breakfast' | 'lunch' | 'dinner';
+export type Macros = {
+  protein: number;
+  fat: number;
+  carbohydrate: number;
+};
 
 export type RecipeInput = Omit<Recipe, 'id'>;
 export type IngredientInput = Omit<Ingredient, 'id'>;

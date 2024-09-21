@@ -1,27 +1,14 @@
 import {Router} from 'express';
-import {
-  GetRecipesQueryParams,
-  GetRecipesQuerySchema,
-} from '../recipeRepository/recipeRepository';
 import {ZodError} from 'zod';
 import {repository} from '../recipeRepository/postgresRepository';
-import {RecipeSchema} from '../models/models';
+import {RecipeRequestSchema, RecipeSchema} from '../models/validators';
+import {DatabaseError} from 'pg';
 
 export const recipesRouter = Router();
 
 recipesRouter.get('/', async (req, res) => {
-  let query: GetRecipesQueryParams;
   try {
-    query = GetRecipesQuerySchema.parse(req.query);
-  } catch (error) {
-    if (error instanceof ZodError) {
-      res.status(422).json({error: error.errors[0].message});
-    } else {
-      res.status(500).send('Internal server error');
-    }
-    return;
-  }
-  try {
+    const query = RecipeRequestSchema.parse(req.query);
     const recipes = await repository.getRecipes(query);
     if (!recipes) {
       res.status(404).send('Recipe not found');
@@ -30,8 +17,14 @@ recipesRouter.get('/', async (req, res) => {
       res.json(recipes);
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).send('Internal server error');
+    if (error instanceof ZodError) {
+      res.status(422).json({error: error.errors[0].message});
+    } else if (error instanceof DatabaseError) {
+      console.error(error.code);
+      res.status(500).send('Database error');
+    } else {
+      res.status(500).send('Internal server error');
+    }
   }
 });
 
@@ -58,7 +51,9 @@ recipesRouter.get('/:id', async (req, res) => {
       res.json(recipe);
     }
   } catch (error) {
-    console.log(error);
+    if (error instanceof DatabaseError) {
+      console.error(error);
+    }
     res.status(500).send('Internal server error');
   }
 });
