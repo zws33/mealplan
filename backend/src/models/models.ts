@@ -14,16 +14,17 @@ export type Ingredient = {
   id: number;
   name: string;
   unit: string;
-  serving_size: number;
+  servingSize: number;
   protein: number;
   carbohydrates: number;
   fat: number;
 };
 export type Instruction = {
-  step: number;
+  stepNumber: number;
   description: string;
 };
-export type RecipeTag = 'breakfast' | 'lunch' | 'dinner';
+export const RecipeTags = ['breakfast', 'lunch', 'dinner'] as const;
+export type RecipeTag = (typeof RecipeTags)[number];
 export type Macros = {
   protein: number;
   fat: number;
@@ -57,7 +58,7 @@ function getMacrosForIngredient(
   quantifiedIngredient: QuantifiedIngredient
 ): Macros {
   const {ingredient, quantity} = quantifiedIngredient;
-  const multiplier = quantity / ingredient.serving_size;
+  const multiplier = quantity / ingredient.servingSize;
   return {
     fat: ingredient.fat * multiplier,
     carbohydrate: ingredient.carbohydrates * multiplier,

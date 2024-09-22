@@ -27,7 +27,7 @@ export class ModelGenerator {
         id: randomInt(0, 10000),
         name: textGenerator.generateWords(randomInt(1, 3)),
         unit: 'g',
-        serving_size: 100,
+        servingSize: 100,
         protein: randomInt(this.protein.min, this.protein.max),
         carbohydrates: randomInt(
           this.carbohydrates.min,
@@ -43,7 +43,7 @@ export class ModelGenerator {
     const instructions: Instruction[] = [];
     for (let i = 0; i < count; i++) {
       instructions.push({
-        step: i,
+        stepNumber: i,
         description: textGenerator.generateSentences(1),
       });
     }

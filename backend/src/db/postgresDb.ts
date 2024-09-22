@@ -1,4 +1,9 @@
 import {Pool} from 'pg';
+import {CamelCasePlugin, Kysely, PostgresDialect} from 'kysely';
+import {DB} from './kysely-types';
+import {types} from 'pg';
+
+types.setTypeParser(1700, parseFloat);
 
 export const PostgresDb = new Pool({
   user: process.env.POSTGRES_USER,
@@ -13,3 +18,10 @@ export async function initializeDatabase() {
   const test = await PostgresDb.query('SELECT NOW()');
   console.log(`Db connection: ${test.rows.length > 0 ? 'success' : 'failure'}`);
 }
+
+export const db = new Kysely<DB>({
+  dialect: new PostgresDialect({
+    pool: PostgresDb,
+  }),
+  plugins: [new CamelCasePlugin()],
+});

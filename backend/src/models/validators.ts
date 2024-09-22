@@ -4,7 +4,7 @@ export const IngredientSchema = z.object({
   id: z.number(),
   name: z.string(),
   unit: z.string(),
-  serving_size: z.number(),
+  servingSize: z.number(),
   protein: z.number(),
   carbohydrates: z.number(),
   fat: z.number(),
@@ -17,7 +17,7 @@ const QuantifiedIngredientSchema = z.object({
 });
 
 const InstructionSchema = z.object({
-  step: z.number(),
+  stepNumber: z.number(),
   description: z.string(),
 });
 

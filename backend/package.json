@@ -10,6 +10,7 @@
     "build": "tsc",
     "fix": "gts fix",
     "watch": "tsc -w",
+    "codegen": "kysely-codegen --dialect postgres --numeric-parser=number --env-file ../.env --camel-case --out-file ./src/db/kysely-types.d.ts",
     "dev": "nodemon --config nodemon.json",
     "start": "node build/index.js"
   },
@@ -37,6 +38,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "kysely": "^0.27.4",
+    "kysely-codegen": "^0.16.8",
     "lorem-ipsum": "^2.0.8",
     "morgan": "^1.10.0",
     "pg": "^8.12.0",

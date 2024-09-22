@@ -12,7 +12,7 @@ describe('ModelGenerator', () => {
       expect(ingredient.id).toBeLessThanOrEqual(10000);
       expect(ingredient.name).toBeDefined();
       expect(ingredient.unit).toBe('g');
-      expect(ingredient.serving_size).toBe(100);
+      expect(ingredient.servingSize).toBe(100);
       expect(ingredient.protein).toBeGreaterThanOrEqual(1);
       expect(ingredient.protein).toBeLessThanOrEqual(100);
       expect(ingredient.carbohydrates).toBeGreaterThanOrEqual(1);
@@ -36,7 +36,7 @@ describe('ModelGenerator', () => {
         expect(ingredient.id).toBeLessThanOrEqual(10000);
         expect(ingredient.name).toBeDefined();
         expect(ingredient.unit).toBe('g');
-        expect(ingredient.serving_size).toBe(100);
+        expect(ingredient.servingSize).toBe(100);
         expect(ingredient.protein).toBeGreaterThanOrEqual(1);
         expect(ingredient.protein).toBeLessThanOrEqual(100);
         expect(ingredient.carbohydrates).toBeGreaterThanOrEqual(1);

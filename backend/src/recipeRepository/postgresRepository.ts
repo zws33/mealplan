@@ -1,130 +1,119 @@
-import {Pool} from 'pg';
-import {PostgresDb} from '../db/postgresDb';
+import {db} from '../db/postgresDb';
 import {
   Ingredient,
   IngredientInput,
   Recipe,
   RecipeInput,
+  RecipeTag,
+  RecipeTags,
 } from '../models/models';
 import {RecipeRequestParams, Repository} from './recipeRepository';
 import {readFileSync} from 'fs';
+import {Kysely} from 'kysely';
+import {DB} from '../db/kysely-types';
 
 export class PostgresRepository implements Repository {
-  constructor(private readonly db: Pool) {}
+  constructor(private readonly db: Kysely<DB>) {}
   async createRecipe(recipeInput: RecipeInput) {
-    const client = await this.db.connect();
-    try {
-      await client.query('BEGIN');
-      const recipeResult = await client.query<{id: number; name: string}>(
-        `INSERT INTO recipe (name) 
-        VALUES ($1) 
-        RETURNING *`,
-        [recipeInput.name]
-      );
+    const txn = await this.db.transaction().execute(async db => {
+      const recipe = await db
+        .insertInto('recipe')
+        .values({name: 'test1'})
+        .returningAll()
+        .executeTakeFirstOrThrow();
       for (const quantifiedIngredient of recipeInput.ingredients) {
-        await client.query(
-          `INSERT INTO recipe_ingredient (recipe_id, ingredient_id, quantity, unit) 
-          VALUES ($1, $2, $3, $4)`,
-          [
-            recipeResult.rows[0].id,
-            quantifiedIngredient.ingredient.id,
-            quantifiedIngredient.quantity,
-            quantifiedIngredient.unit,
-          ]
-        );
+        await db
+          .insertInto('recipeIngredient')
+          .values({
+            recipeId: recipe.id,
+            ingredientId: quantifiedIngredient.ingredient.id,
+            quantity: quantifiedIngredient.quantity,
+            unit: quantifiedIngredient.unit,
+          })
+          .execute();
       }
       for (const instruction of recipeInput.instructions) {
-        await client.query(
-          `INSERT INTO recipe_instruction (recipe_id, step_number, description) 
-          VALUES ($1, $2, $3)`,
-          [recipeResult.rows[0].id, instruction.step, instruction.description]
-        );
+        await db
+          .insertInto('recipeInstruction')
+          .values({
+            recipeId: recipe.id,
+            stepNumber: instruction.stepNumber,
+            description: instruction.description,
+          })
+          .execute();
       }
       for (const tag of recipeInput.tags) {
-        await client.query(
-          `INSERT INTO recipe_tag (recipe_id, tag) 
-          VALUES ($1, $2)`,
-          [recipeResult.rows[0].id, tag]
-        );
+        await db
+          .insertInto('recipeTag')
+          .values({
+            recipeId: recipe.id,
+            tag,
+          })
+          .execute();
       }
-      client.query('COMMIT');
-      return {
-        recipe: {
-          id: recipeResult.rows[0].id,
-          name: recipeResult.rows[0].name,
-          ingredients: recipeInput.ingredients,
-          instructions: recipeInput.instructions,
-          tags: recipeInput.tags,
-        },
-      };
-    } catch (e) {
-      client.query('ROLLBACK');
-      throw e;
-    } finally {
-      client.release();
-    }
+      return recipe;
+    });
+    return txn;
   }
-  async getRecipeById(id: number): Promise<Recipe | undefined> {
-    const recipeName = await this.db.query(
-      'SELECT name FROM recipe WHERE id = $1',
-      [id]
-    );
-    if (!recipeName.rows.length) {
-      return undefined;
-    }
-    const ingredientRows = await this.db.query(
-      `SELECT 
-        ri.unit AS recipe_unit,
-        ri.quantity AS recipe_quantity,
-        i.id,
-        i.name,
-        i.unit,
-        i.serving_size,
-        i.carbohydrates,
-        i.protein,
-        i.fat
 
-      FROM recipe_ingredient ri
-      JOIN ingredient i ON ri.ingredient_id = i.id
-      WHERE ri.recipe_id = $1;`,
-      [id]
-    );
-    const quantifiedIngredients = ingredientRows.rows.map(row => {
+  async getRecipeById(id: number): Promise<Recipe | undefined> {
+    const recipe = await this.db
+      .selectFrom('recipe')
+      .select('name')
+      .where('id', '=', id)
+      .executeTakeFirstOrThrow();
+
+    const ingredientRows = await this.db
+      .selectFrom('recipeIngredient')
+      .innerJoin('ingredient', 'ingredient.id', 'recipeIngredient.ingredientId')
+      .select([
+        'recipeIngredient.unit as recipeUnit',
+        'recipeIngredient.quantity as recipeQuantity',
+        'ingredient.id',
+        'ingredient.name',
+        'ingredient.unit',
+        'ingredient.servingSize',
+        'ingredient.carbohydrates',
+        'ingredient.protein',
+        'ingredient.fat',
+      ])
+      .where('recipeId', '=', id)
+      .execute();
+    const quantifiedIngredients = ingredientRows.map(row => {
       return {
-        unit: row.recipe_unit,
-        quantity: row.recipe_quantity,
+        unit: row.recipeUnit,
+        quantity: row.recipeQuantity,
         ingredient: {
           id: row.id,
           name: row.name,
           unit: row.unit,
-          serving_size: row.serving_size,
-          carbohydrates: parseFloat(row.carbohydrates),
-          protein: parseFloat(row.protein),
-          fat: parseFloat(row.fat),
+          servingSize: row.servingSize,
+          carbohydrates: row.carbohydrates,
+          protein: row.protein,
+          fat: row.fat,
         },
       };
     });
-    const instructionRows = await this.db.query(
-      'SELECT * FROM recipe_instruction WHERE recipe_id = $1',
-      [id]
-    );
-    const instructions = instructionRows.rows.map(row => {
-      return {
-        step: row.step_number,
-        description: row.description,
-      };
-    });
-    const tagRows = await this.db.query(
-      'SELECT tag FROM recipe_tag WHERE recipe_id = $1',
-      [id]
-    );
+    const instructions = await this.db
+      .selectFrom('recipeInstruction')
+      .select(['stepNumber', 'description'])
+      .where('recipeId', '=', id)
+      .execute();
 
+    const tagRows = await this.db
+      .selectFrom('recipeTag')
+      .select('recipeTag.tag')
+      .where('recipeTag.recipeId', '=', id)
+      .execute();
+    const tags = tagRows
+      .map(row => row.tag)
+      .filter((tag): tag is RecipeTag => RecipeTags.includes(tag as RecipeTag));
     return {
       id,
-      name: recipeName.rows[0].name,
+      name: recipe.name,
       ingredients: quantifiedIngredients,
       instructions: instructions,
-      tags: tagRows.rows.map(row => row.tag),
+      tags: tags,
     };
   }
 
@@ -133,68 +122,41 @@ export class PostgresRepository implements Repository {
   }
 
   async deleteRecipe(id: number): Promise<boolean> {
-    const result = await this.db.query('DELETE FROM recipe WHERE id = $1', [
-      id,
-    ]);
-    return result.rows[0];
+    const result = await this.db
+      .deleteFrom('recipe')
+      .where('id', '=', id)
+      .executeTakeFirst();
+    return result.numDeletedRows > 0;
   }
 
   async getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {
     throw new Error('Method not implemented.');
   }
 
-  async insertIngredient(ingredient: IngredientInput): Promise<Ingredient> {
-    const result = await PostgresDb.query<Ingredient>(
-      `INSERT INTO ingredient (name, fat, carbohydrates, protein, serving_size, unit) 
-        VALUES ($1, $2, $3, $4, $5, $6) 
-        RETURNING *`,
-      [
-        ingredient.name,
-        ingredient.fat,
-        ingredient.carbohydrates,
-        ingredient.protein,
-        ingredient.serving_size,
-        ingredient.unit,
-      ]
-    );
-    return result.rows[0];
+  async createIngredient(ingredient: IngredientInput): Promise<Ingredient> {
+    const result = await this.db
+      .insertInto('ingredient')
+      .values({
+        name: ingredient.name,
+        fat: ingredient.fat,
+        carbohydrates: ingredient.carbohydrates,
+        protein: ingredient.protein,
+        servingSize: ingredient.servingSize,
+        unit: ingredient.unit,
+      })
+      .returningAll()
+      .executeTakeFirstOrThrow();
+    return result;
   }
 
   async getIngredientById(id: number): Promise<Ingredient> {
-    const result = await PostgresDb.query(
-      'SELECT * FROM ingredient WHERE id = $1',
-      [id]
-    );
-    result.rows.map(ingredient => {
-      return {
-        name: ingredient.name,
-        serving_size: ingredient.serving_size,
-        unit: ingredient.unit,
-        carbohydrates: parseFloat(ingredient.carbohydrates),
-        fat: parseFloat(ingredient.fat),
-        protein: parseFloat(ingredient.protein),
-      };
-    });
-    return result.rows[0];
+    const result = await this.db
+      .selectFrom('ingredient')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirstOrThrow();
+    return result;
   }
 }
 
-export const repository = new PostgresRepository(PostgresDb);
-
-export async function populateDatabase() {
-  try {
-    const ingredientsJson = readFileSync('./src/db/ingredients.json', 'utf-8');
-    const ingredients: Ingredient[] = JSON.parse(ingredientsJson);
-    const recipeData = readFileSync('./src/db/recipes.json', 'utf-8');
-    const recipes: Recipe[] = JSON.parse(recipeData);
-
-    for (const ingredient of ingredients) {
-      await repository.insertIngredient(ingredient);
-    }
-    for (const recipe of recipes) {
-      await repository.createRecipe(recipe);
-    }
-  } catch (e) {
-    console.error(e);
-  }
-}
+export const repository = new PostgresRepository(db);

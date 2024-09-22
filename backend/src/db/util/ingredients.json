@@ -3,7 +3,7 @@
     "id": 2,
     "name": "Brown Rice",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 2.6,
     "carbohydrates": 23,
     "fat": 0.9
@@ -12,7 +12,7 @@
     "id": 3,
     "name": "Broccoli",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 2.8,
     "carbohydrates": 7,
     "fat": 0.4
@@ -21,7 +21,7 @@
     "id": 4,
     "name": "Salmon",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 20,
     "carbohydrates": 0,
     "fat": 13
@@ -30,7 +30,7 @@
     "id": 5,
     "name": "Almonds",
     "unit": "grams",
-    "serving_size": 28,
+    "servingSize": 28,
     "protein": 6,
     "carbohydrates": 6,
     "fat": 14
@@ -39,7 +39,7 @@
     "id": 6,
     "name": "Spinach",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 2.9,
     "carbohydrates": 3.6,
     "fat": 0.4
@@ -48,7 +48,7 @@
     "id": 7,
     "name": "Eggs",
     "unit": "large",
-    "serving_size": 1,
+    "servingSize": 1,
     "protein": 6.3,
     "carbohydrates": 0.6,
     "fat": 5
@@ -57,7 +57,7 @@
     "id": 8,
     "name": "Quinoa",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 4.4,
     "carbohydrates": 21.3,
     "fat": 1.9
@@ -66,7 +66,7 @@
     "id": 9,
     "name": "Sweet Potato",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 1.6,
     "carbohydrates": 20,
     "fat": 0.1
@@ -75,7 +75,7 @@
     "id": 10,
     "name": "Avocado",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 2,
     "carbohydrates": 9,
     "fat": 15
@@ -84,7 +84,7 @@
     "id": 11,
     "name": "Greek Yogurt",
     "unit": "grams",
-    "serving_size": 170,
+    "servingSize": 170,
     "protein": 10,
     "carbohydrates": 4,
     "fat": 0
@@ -93,7 +93,7 @@
     "id": 12,
     "name": "Chicken Thigh",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 19,
     "carbohydrates": 0,
     "fat": 10
@@ -102,7 +102,7 @@
     "id": 13,
     "name": "Tuna",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 29,
     "carbohydrates": 0,
     "fat": 1
@@ -111,7 +111,7 @@
     "id": 14,
     "name": "Peanut Butter",
     "unit": "grams",
-    "serving_size": 32,
+    "servingSize": 32,
     "protein": 8,
     "carbohydrates": 6,
     "fat": 16
@@ -120,7 +120,7 @@
     "id": 15,
     "name": "Blueberries",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 0.7,
     "carbohydrates": 14,
     "fat": 0.3
@@ -129,7 +129,7 @@
     "id": 16,
     "name": "Oats",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 16.9,
     "carbohydrates": 66.3,
     "fat": 6.9
@@ -138,7 +138,7 @@
     "id": 17,
     "name": "Cottage Cheese",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 11.1,
     "carbohydrates": 3.4,
     "fat": 4.3
@@ -147,7 +147,7 @@
     "id": 18,
     "name": "Carrots",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 0.9,
     "carbohydrates": 10,
     "fat": 0.2
@@ -156,7 +156,7 @@
     "id": 19,
     "name": "Beef Steak",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 25,
     "carbohydrates": 0,
     "fat": 17
@@ -165,7 +165,7 @@
     "id": 20,
     "name": "Shrimp",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 24,
     "carbohydrates": 0.2,
     "fat": 0.3
@@ -174,7 +174,7 @@
     "id": 21,
     "name": "Milk",
     "unit": "ml",
-    "serving_size": 240,
+    "servingSize": 240,
     "protein": 8,
     "carbohydrates": 12,
     "fat": 8
@@ -183,7 +183,7 @@
     "id": 22,
     "name": "Lentils",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 9,
     "carbohydrates": 20,
     "fat": 0.4
@@ -192,7 +192,7 @@
     "id": 23,
     "name": "Tomatoes",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 0.9,
     "carbohydrates": 3.9,
     "fat": 0.2
@@ -201,7 +201,7 @@
     "id": 24,
     "name": "Walnuts",
     "unit": "grams",
-    "serving_size": 28,
+    "servingSize": 28,
     "protein": 4.3,
     "carbohydrates": 3.9,
     "fat": 18.5
@@ -210,7 +210,7 @@
     "id": 25,
     "name": "Hummus",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 8,
     "carbohydrates": 14.3,
     "fat": 9.6
@@ -219,7 +219,7 @@
     "id": 26,
     "name": "Cheddar Cheese",
     "unit": "grams",
-    "serving_size": 100,
+    "servingSize": 100,
     "protein": 24,
     "carbohydrates": 1.3,
     "fat": 33
@@ -228,7 +228,7 @@
     "id": 27,
     "name": "Banana",
     "unit": "grams",
-    "serving_size": 118,
+    "servingSize": 118,
     "protein": 1.3,
     "carbohydrates": 27,
     "fat": 0.3

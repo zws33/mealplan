@@ -11,7 +11,7 @@ ingredientsRouter.post('/', async (req, res) => {
   const inputSchema = IngredientSchema.omit({id: true});
   try {
     const ingredientInput = inputSchema.parse(req.body);
-    const result = await repository.insertIngredient(ingredientInput);
+    const result = await repository.createIngredient(ingredientInput);
     res.status(200).json(result);
   } catch (error) {
     if (error instanceof ZodError) {

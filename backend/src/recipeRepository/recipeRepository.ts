@@ -7,14 +7,12 @@ import {
 } from '../models/models';
 
 export interface Repository {
-  createRecipe(
-    recipeInput: RecipeInput
-  ): Promise<{recipe: {id: number; name: string}}>;
+  createRecipe(recipeInput: RecipeInput): Promise<{id: number; name: string}>;
   getRecipeById(id: number): Promise<Recipe | undefined>;
   getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]>;
   updateRecipe(recipe: Recipe): Promise<Recipe>;
   deleteRecipe(id: number): Promise<boolean>;
-  insertIngredient(ingredient: IngredientInput): Promise<Ingredient>;
+  createIngredient(ingredient: IngredientInput): Promise<Ingredient>;
   getIngredientById(id: number): Promise<Ingredient>;
 }
 export type RecipeRequestParams = {
