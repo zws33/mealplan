@@ -1,14 +1,19 @@
 import {Router} from 'express';
 import {ZodError} from 'zod';
 import {repository} from '../recipeRepository/postgresRepository';
-import {RecipeRequestSchema, RecipeSchema} from '../models/validators';
+import {RecipeSchema, RecipeTagSchema} from '../models/validators';
 import {DatabaseError} from 'pg';
+import {RecipeRequestParams} from '../recipeRepository/recipeRepository';
 
 export const recipesRouter = Router();
 
 recipesRouter.get('/', async (req, res) => {
   try {
-    const query = RecipeRequestSchema.parse(req.query);
+    const tags = Array.isArray(req.query.tag) ? req.query.tag : [req.query.tag];
+    const query: RecipeRequestParams = {
+      tags: RecipeTagSchema.array().parse(tags),
+      limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+    };
     const recipes = await repository.getRecipes(query);
     if (!recipes) {
       res.status(404).send('Recipe not found');

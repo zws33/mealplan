@@ -8,7 +8,6 @@ import {
   RecipeTags,
 } from '../models/models';
 import {RecipeRequestParams, Repository} from './recipeRepository';
-import {readFileSync} from 'fs';
 import {Kysely} from 'kysely';
 import {DB} from '../db/kysely-types';
 
@@ -130,7 +129,25 @@ export class PostgresRepository implements Repository {
   }
 
   async getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {
-    throw new Error('Method not implemented.');
+    const recipeIds =
+      queryParams.tags !== undefined
+        ? await this.db
+            .selectFrom('recipeTag')
+            .innerJoin('recipe', 'recipeTag.recipeId', 'recipe.id')
+            .select('recipe.id')
+            .where('recipeTag.tag', 'in', queryParams.tags)
+            .limit(queryParams.limit ?? 10)
+            .execute()
+        : [];
+
+    const recipes: Recipe[] = [];
+    for (const id of recipeIds) {
+      const recipe = await this.getRecipeById(id.id);
+      if (recipe) {
+        recipes.push(recipe);
+      }
+    }
+    return recipes;
   }
 
   async createIngredient(ingredient: IngredientInput): Promise<Ingredient> {
