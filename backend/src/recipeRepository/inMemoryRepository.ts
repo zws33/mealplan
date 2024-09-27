@@ -1,7 +1,11 @@
 import {existsSync, readFileSync, writeFileSync} from 'fs';
 import {ModelGenerator} from '../models/modelGenerator';
-import {Recipe, RecipeInput, RecipeSchema} from '../models/models';
-import {RecipeRequestParams} from './recipeRepository';
+import {
+  Recipe,
+  RecipeInput,
+  RecipeRequestParams,
+  RecipeSchema,
+} from '../models/models';
 import {ZodError} from 'zod';
 import {calculateRecipeCalories, getMacros} from '../models/utils';
 

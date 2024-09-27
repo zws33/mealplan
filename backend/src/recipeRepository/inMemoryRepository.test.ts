@@ -1,7 +1,7 @@
 import {InMemoryRepository} from './inMemoryRepository';
 import {unlink, writeFileSync} from 'node:fs';
 import {ModelGenerator} from '../models/modelGenerator';
-import {Recipe, RecipeInput} from '../models/models';
+import {Recipe, RecipeInput, RecipeTag} from '../models/models';
 import {calculateRecipeCalories, getMacros} from '../models/utils';
 
 describe('InMemoryRecipeRepository', () => {
@@ -23,7 +23,7 @@ describe('InMemoryRecipeRepository', () => {
 
   test('getRecipes returns the correct recipes', async () => {
     const queryOptions = {
-      tags: ['lunch'],
+      tags: ['lunch'] as RecipeTag[],
       minProtein: 20,
       maxProtein: 30,
       minCalories: 200,
