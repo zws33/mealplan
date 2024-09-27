@@ -2,12 +2,8 @@ import {RecipeRequestParams} from './recipeRepository';
 import {InMemoryRepository} from './inMemoryRepository';
 import {unlink, writeFileSync} from 'node:fs';
 import {ModelGenerator} from '../models/modelGenerator';
-import {
-  calculateRecipeCalories,
-  getMacros,
-  Recipe,
-  RecipeInput,
-} from '../models/models';
+import {Recipe, RecipeInput} from '../models/models';
+import {calculateRecipeCalories, getMacros} from '../models/utils';
 
 describe('InMemoryRecipeRepository', () => {
   let repository: InMemoryRepository;

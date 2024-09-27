@@ -1,67 +1,58 @@
-export type Recipe = {
-  id: number;
-  name: string;
-  tags: RecipeTag[];
-  ingredients: QuantifiedIngredient[];
-  instructions: Instruction[];
-};
-export type QuantifiedIngredient = {
-  unit: string;
-  ingredient: Ingredient;
-  quantity: number;
-};
-export type Ingredient = {
-  id: number;
-  name: string;
-  unit: string;
-  servingSize: number;
-  protein: number;
-  carbohydrates: number;
-  fat: number;
-};
-export type Instruction = {
-  stepNumber: number;
-  description: string;
-};
+import z from 'zod';
+export const IngredientSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  unit: z.string(),
+  servingSize: z.number(),
+  protein: z.number(),
+  carbohydrates: z.number(),
+  fat: z.number(),
+});
+
+const QuantifiedIngredientSchema = z.object({
+  ingredient: IngredientSchema,
+  quantity: z.number(),
+  unit: z.string(),
+});
+
+const InstructionSchema = z.object({
+  stepNumber: z.number(),
+  description: z.string(),
+});
+
+const MacrosSchema = z.object({
+  fat: z.number(),
+  carbohydrate: z.number(),
+  protein: z.number(),
+});
+
+export const RecipeTagSchema = z.enum(['breakfast', 'lunch', 'dinner']);
+
+export const RecipeSchema = z.object({
+  id: z.number(),
+  tags: RecipeTagSchema.array(),
+  name: z.string(),
+  ingredients: z.array(QuantifiedIngredientSchema),
+  instructions: z.array(InstructionSchema),
+});
+
+export const RecipeRequestSchema = z.object({
+  tags: RecipeTagSchema.array().optional(),
+  nameIncludes: z.string().optional(),
+  minProtein: z.number().optional(),
+  maxProtein: z.number().optional(),
+  minCalories: z.number().optional(),
+  maxCalories: z.number().optional(),
+  limit: z.number().optional(),
+});
+
+export type Recipe = z.infer<typeof RecipeSchema>;
+export type QuantifiedIngredient = z.infer<typeof QuantifiedIngredientSchema>;
+export type Ingredient = z.infer<typeof IngredientSchema>;
+export type Instruction = z.infer<typeof InstructionSchema>;
 export const RecipeTags = ['breakfast', 'lunch', 'dinner'] as const;
 export type RecipeTag = (typeof RecipeTags)[number];
-export type Macros = {
-  protein: number;
-  fat: number;
-  carbohydrate: number;
-};
+export type Macros = z.infer<typeof MacrosSchema>;
 
 export type RecipeInput = Omit<Recipe, 'id'>;
 export type IngredientInput = Omit<Ingredient, 'id'>;
-
-export function calculateRecipeCalories(recipe: Recipe): number {
-  const macros = getMacros(recipe);
-  return macros.fat * 9 + macros.carbohydrate * 4 + macros.protein * 4;
-}
-
-export function getShoppingList(recipe: Recipe): QuantifiedIngredient[] {
-  return recipe.ingredients;
-}
-
-export function getMacros(recipe: Recipe): Macros {
-  const macros = recipe.ingredients.map(getMacrosForIngredient);
-  return macros.reduce((sum, current) => {
-    return {
-      fat: sum.fat + current.fat,
-      carbohydrate: sum.carbohydrate + current.carbohydrate,
-      protein: sum.protein + current.protein,
-    };
-  });
-}
-
-function getMacrosForIngredient(
-  quantifiedIngredient: QuantifiedIngredient
-): Macros {
-  const {ingredient, quantity} = quantifiedIngredient;
-  const multiplier = quantity / ingredient.servingSize;
-  return {
-    fat: ingredient.fat * multiplier,
-    carbohydrate: ingredient.carbohydrates * multiplier,
-    protein: ingredient.protein * multiplier,
-  };
-}

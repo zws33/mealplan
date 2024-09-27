@@ -1,14 +1,9 @@
 import {existsSync, readFileSync, writeFileSync} from 'fs';
 import {ModelGenerator} from '../models/modelGenerator';
-import {
-  Recipe,
-  RecipeInput,
-  getMacros,
-  calculateRecipeCalories,
-} from '../models/models';
+import {Recipe, RecipeInput, RecipeSchema} from '../models/models';
 import {RecipeRequestParams} from './recipeRepository';
 import {ZodError} from 'zod';
-import {RecipeSchema} from '../models/validators';
+import {calculateRecipeCalories, getMacros} from '../models/utils';
 
 export class InMemoryRepository {
   private readonly recipes: Map<number, Recipe> = new Map();

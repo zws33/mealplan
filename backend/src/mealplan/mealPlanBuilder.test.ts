@@ -1,6 +1,6 @@
-import {MealPlanBuilder} from './mealPlanBuilder';
-import {calculateRecipeCalories, getMacros} from '../models/models';
 import {ModelGenerator} from '../models/modelGenerator';
+import {calculateRecipeCalories, getMacros} from '../models/utils';
+import {MealPlanBuilder} from './mealPlanBuilder';
 
 describe('MealPlanBuilder', () => {
   const mealTypes = ['breakfast', 'lunch', 'dinner'] as const;
