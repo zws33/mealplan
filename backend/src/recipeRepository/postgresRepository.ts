@@ -4,14 +4,15 @@ import {
   IngredientInput,
   Recipe,
   RecipeInput,
+  RecipeRequestParams,
   RecipeTag,
   RecipeTags,
 } from '../models/models';
-import {RecipeRequestParams, Repository} from './recipeRepository';
+import {RecipeRepository} from './recipeRepository';
 import {Kysely} from 'kysely';
 import {DB} from '../db/kysely-types';
 
-export class PostgresRepository implements Repository {
+export class PostgresRepository implements RecipeRepository {
   constructor(private readonly db: Kysely<DB>) {}
   async createRecipe(recipeInput: RecipeInput) {
     const txn = await this.db.transaction().execute(async txn => {
@@ -72,7 +73,7 @@ export class PostgresRepository implements Repository {
     return txn;
   }
 
-  async getRecipeById(id: number): Promise<Recipe | undefined> {
+  async findRecipeById(id: number): Promise<Recipe | undefined> {
     const recipe = await this.db
       .selectFrom('recipe')
       .select('name')
@@ -145,7 +146,7 @@ export class PostgresRepository implements Repository {
     return result.numDeletedRows > 0;
   }
 
-  async getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {
+  async findAllRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {
     const recipeIds =
       queryParams.tags !== undefined
         ? await this.db
@@ -159,7 +160,7 @@ export class PostgresRepository implements Repository {
 
     const recipes: Recipe[] = [];
     for (const id of recipeIds) {
-      const recipe = await this.getRecipeById(id.id);
+      const recipe = await this.findRecipeById(id.id);
       if (recipe) {
         recipes.push(recipe);
       }
@@ -183,7 +184,7 @@ export class PostgresRepository implements Repository {
     return result;
   }
 
-  async getIngredientById(id: number): Promise<Ingredient> {
+  async findIngredientById(id: number): Promise<Ingredient> {
     const result = await this.db
       .selectFrom('ingredient')
       .selectAll()

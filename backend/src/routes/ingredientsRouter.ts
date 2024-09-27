@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {Ingredient} from '../models/models';
+
 import {repository} from '../recipeRepository/postgresRepository';
 import {IngredientSchema} from '../models/models';
 import {DatabaseError} from 'pg';
@@ -26,7 +26,16 @@ ingredientsRouter.post('/', async (req, res) => {
 });
 
 ingredientsRouter.get('/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const result: Ingredient = await repository.getIngredientById(id);
-  res.json(result);
+  try {
+    const id = parseInt(req.params.id);
+    const result = await repository.findIngredientById(id);
+    res.json(result);
+  } catch (error) {
+    if (error instanceof DatabaseError) {
+      console.error(error);
+      res.status(404).send('Ingredient not found');
+    } else {
+      res.status(500).send('Internal server error');
+    }
+  }
 });

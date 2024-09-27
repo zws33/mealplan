@@ -3,25 +3,15 @@ import {
   IngredientInput,
   Recipe,
   RecipeInput,
-  RecipeTag,
+  RecipeRequestParams,
 } from '../models/models';
 
-export interface Repository {
+export interface RecipeRepository {
   createRecipe(recipeInput: RecipeInput): Promise<Recipe>;
-  getRecipeById(id: number): Promise<Recipe | undefined>;
-  getRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]>;
+  findRecipeById(id: number): Promise<Recipe | undefined>;
+  findAllRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]>;
   updateRecipe(recipe: Recipe): Promise<Recipe>;
   deleteRecipe(id: number): Promise<boolean>;
   createIngredient(ingredient: IngredientInput): Promise<Ingredient>;
-  getIngredientById(id: number): Promise<Ingredient>;
+  findIngredientById(id: number): Promise<Ingredient>;
 }
-
-export type RecipeRequestParams = {
-  tags?: RecipeTag[] | undefined;
-  nameIncludes?: string | undefined;
-  minProtein?: number | undefined;
-  maxProtein?: number | undefined;
-  minCalories?: number | undefined;
-  maxCalories?: number | undefined;
-  limit?: number | undefined;
-};

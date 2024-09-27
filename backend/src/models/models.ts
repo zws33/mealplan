@@ -56,3 +56,12 @@ export type Macros = z.infer<typeof MacrosSchema>;
 
 export type RecipeInput = Omit<Recipe, 'id'>;
 export type IngredientInput = Omit<Ingredient, 'id'>;
+export type RecipeRequestParams = {
+  tags?: RecipeTag[] | undefined;
+  nameIncludes?: string | undefined;
+  minProtein?: number | undefined;
+  maxProtein?: number | undefined;
+  minCalories?: number | undefined;
+  maxCalories?: number | undefined;
+  limit?: number | undefined;
+};
