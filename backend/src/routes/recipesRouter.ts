@@ -1,9 +1,9 @@
 import {Router} from 'express';
 import {ZodError} from 'zod';
 import {repository} from '../recipeRepository/postgresRepository';
-import {RecipeSchema, RecipeTagSchema} from '../models/validators';
 import {DatabaseError} from 'pg';
 import {RecipeRequestParams} from '../recipeRepository/recipeRepository';
+import {RecipeSchema, RecipeTagSchema} from '../models/models';
 
 export const recipesRouter = Router();
 
@@ -34,8 +34,8 @@ recipesRouter.get('/', async (req, res) => {
 });
 
 recipesRouter.post('/', async (req, res) => {
-  const recipe = RecipeSchema.omit({id: true}).parse(req.body);
   try {
+    const recipe = RecipeSchema.omit({id: true}).parse(req.body);
     const result = await repository.createRecipe(recipe);
     res.json(result);
   } catch (error) {

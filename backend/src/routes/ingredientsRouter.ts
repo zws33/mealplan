@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {Ingredient} from '../models/models';
 import {repository} from '../recipeRepository/postgresRepository';
-import {IngredientSchema} from '../models/validators';
+import {IngredientSchema} from '../models/models';
 import {DatabaseError} from 'pg';
 import {ZodError} from 'zod';
 

@@ -2,7 +2,6 @@ import {Pool} from 'pg';
 import {CamelCasePlugin, Kysely, PostgresDialect} from 'kysely';
 import {DB} from './kysely-types';
 import {types} from 'pg';
-
 types.setTypeParser(1700, parseFloat);
 
 export const PostgresDb = new Pool({

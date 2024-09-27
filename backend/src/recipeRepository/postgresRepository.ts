@@ -14,43 +14,60 @@ import {DB} from '../db/kysely-types';
 export class PostgresRepository implements Repository {
   constructor(private readonly db: Kysely<DB>) {}
   async createRecipe(recipeInput: RecipeInput) {
-    const txn = await this.db.transaction().execute(async db => {
-      const recipe = await db
+    const txn = await this.db.transaction().execute(async txn => {
+      const recipe = await txn
         .insertInto('recipe')
-        .values({name: 'test1'})
+        .values({name: recipeInput.name})
         .returningAll()
         .executeTakeFirstOrThrow();
-      for (const quantifiedIngredient of recipeInput.ingredients) {
-        await db
-          .insertInto('recipeIngredient')
-          .values({
+      const recipeIngredients = recipeInput.ingredients.map(
+        quantifiedIngredient => {
+          return {
             recipeId: recipe.id,
             ingredientId: quantifiedIngredient.ingredient.id,
             quantity: quantifiedIngredient.quantity,
             unit: quantifiedIngredient.unit,
-          })
-          .execute();
-      }
-      for (const instruction of recipeInput.instructions) {
-        await db
-          .insertInto('recipeInstruction')
-          .values({
-            recipeId: recipe.id,
-            stepNumber: instruction.stepNumber,
-            description: instruction.description,
-          })
-          .execute();
-      }
-      for (const tag of recipeInput.tags) {
-        await db
-          .insertInto('recipeTag')
-          .values({
-            recipeId: recipe.id,
-            tag,
-          })
-          .execute();
-      }
-      return recipe;
+          };
+        }
+      );
+      await txn
+        .insertInto('recipeIngredient')
+        .values(recipeIngredients)
+        .returningAll()
+        .execute();
+
+      const recipeInstructions = recipeInput.instructions.map(instruction => {
+        return {
+          recipeId: recipe.id,
+          ...instruction,
+        };
+      });
+      await txn
+        .insertInto('recipeInstruction')
+        .values(recipeInstructions)
+        .returningAll()
+        .execute();
+
+      const recipeTags = recipeInput.tags.map(tag => {
+        return {
+          recipeId: recipe.id,
+          tag,
+        };
+      });
+      await txn
+        .insertInto('recipeTag')
+        .values(recipeTags)
+        .returningAll()
+        .execute();
+
+      const insertedRecipe: Recipe = {
+        id: recipe.id,
+        name: recipeInput.name,
+        ingredients: recipeInput.ingredients,
+        instructions: recipeInput.instructions,
+        tags: recipeInput.tags,
+      };
+      return insertedRecipe;
     });
     return txn;
   }
