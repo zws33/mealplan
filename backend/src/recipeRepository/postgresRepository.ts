@@ -2,8 +2,8 @@ import {db} from '../db/postgresDb';
 import {
   Ingredient,
   IngredientInput,
+  Instruction,
   Recipe,
-  RecipeInput,
   RecipeRequestParams,
   RecipeTag,
   RecipeTags,
@@ -14,30 +14,37 @@ import {DB} from '../db/kysely-types';
 
 export class PostgresRepository implements RecipeRepository {
   constructor(private readonly db: Kysely<DB>) {}
-  async createRecipe(recipeInput: RecipeInput) {
-    const txn = await this.db.transaction().execute(async txn => {
+  async createRecipe(
+    name: string,
+    ingredients: {
+      ingredientId: number;
+      quantity: number;
+      unit: string;
+    }[],
+    instructions: Instruction[],
+    tags: RecipeTag[]
+  ) {
+    return await this.db.transaction().execute(async txn => {
       const recipe = await txn
         .insertInto('recipe')
-        .values({name: recipeInput.name})
-        .returningAll()
+        .values({name})
+        .returning('id')
         .executeTakeFirstOrThrow();
-      const recipeIngredients = recipeInput.ingredients.map(
-        quantifiedIngredient => {
-          return {
-            recipeId: recipe.id,
-            ingredientId: quantifiedIngredient.ingredient.id,
-            quantity: quantifiedIngredient.quantity,
-            unit: quantifiedIngredient.unit,
-          };
-        }
-      );
+      const recipeIngredients = ingredients.map(i => {
+        return {
+          recipeId: recipe.id,
+          ingredientId: i.ingredientId,
+          quantity: i.quantity,
+          unit: i.unit,
+        };
+      });
       await txn
         .insertInto('recipeIngredient')
         .values(recipeIngredients)
         .returningAll()
         .execute();
 
-      const recipeInstructions = recipeInput.instructions.map(instruction => {
+      const recipeInstructions = instructions.map(instruction => {
         return {
           recipeId: recipe.id,
           ...instruction,
@@ -49,7 +56,7 @@ export class PostgresRepository implements RecipeRepository {
         .returningAll()
         .execute();
 
-      const recipeTags = recipeInput.tags.map(tag => {
+      const recipeTags = tags.map(tag => {
         return {
           recipeId: recipe.id,
           tag,
@@ -61,16 +68,8 @@ export class PostgresRepository implements RecipeRepository {
         .returningAll()
         .execute();
 
-      const insertedRecipe: Recipe = {
-        id: recipe.id,
-        name: recipeInput.name,
-        ingredients: recipeInput.ingredients,
-        instructions: recipeInput.instructions,
-        tags: recipeInput.tags,
-      };
-      return insertedRecipe;
+      return recipe;
     });
-    return txn;
   }
 
   async findRecipeById(id: number): Promise<Recipe | undefined> {
@@ -128,7 +127,7 @@ export class PostgresRepository implements RecipeRepository {
     return {
       id,
       name: recipe.name,
-      ingredients: quantifiedIngredients,
+      quantifiedIngredients: quantifiedIngredients,
       instructions: instructions,
       tags: tags,
     };
@@ -168,8 +167,8 @@ export class PostgresRepository implements RecipeRepository {
     return recipes;
   }
 
-  async createIngredient(ingredient: IngredientInput): Promise<Ingredient> {
-    const result = await this.db
+  async createIngredient(ingredient: IngredientInput) {
+    return await this.db
       .insertInto('ingredient')
       .values({
         name: ingredient.name,
@@ -179,18 +178,17 @@ export class PostgresRepository implements RecipeRepository {
         servingSize: ingredient.servingSize,
         unit: ingredient.unit,
       })
-      .returningAll()
+      .onConflict(c => c.column('name').doNothing())
+      .returning('id')
       .executeTakeFirstOrThrow();
-    return result;
   }
 
-  async findIngredientById(id: number): Promise<Ingredient> {
-    const result = await this.db
+  async findIngredientById(id: number): Promise<Ingredient | undefined> {
+    return await this.db
       .selectFrom('ingredient')
       .selectAll()
       .where('id', '=', id)
-      .executeTakeFirstOrThrow();
-    return result;
+      .executeTakeFirst();
   }
 }
 

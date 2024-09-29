@@ -32,7 +32,7 @@ export const RecipeSchema = z.object({
   id: z.number(),
   tags: RecipeTagSchema.array(),
   name: z.string(),
-  ingredients: z.array(QuantifiedIngredientSchema),
+  quantifiedIngredients: z.array(QuantifiedIngredientSchema),
   instructions: z.array(InstructionSchema),
 });
 
@@ -54,8 +54,19 @@ export const RecipeTags = ['breakfast', 'lunch', 'dinner'] as const;
 export type RecipeTag = (typeof RecipeTags)[number];
 export type Macros = z.infer<typeof MacrosSchema>;
 
-export type RecipeInput = Omit<Recipe, 'id'>;
-export type IngredientInput = Omit<Ingredient, 'id'>;
+export const IngredientInputSchema = IngredientSchema.omit({id:true});
+export const RecipeInputSchema = z.object({
+  name: z.string(),
+  tags: RecipeTagSchema.array(),
+  ingredients: z.object({
+    quantity: z.number(),
+    unit: z.string(),
+    ingredientId: z.number(),
+  }).array(),
+  instructions: InstructionSchema.array()
+})
+export type RecipeInput = z.infer<typeof RecipeInputSchema>;
+export type IngredientInput = z.infer<typeof IngredientInputSchema>;
 export type RecipeRequestParams = {
   tags?: RecipeTag[] | undefined;
   nameIncludes?: string | undefined;

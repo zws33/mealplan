@@ -58,7 +58,7 @@ export class ModelGenerator {
         id: i,
         tags: [(['breakfast', 'lunch', 'dinner'] as const)[randomInt(0, 3)]],
         name: textGenerator.generateWords(randomInt(1, 3)),
-        ingredients: ingredients,
+        quantifiedIngredients: ingredients,
         instructions: this.generateInstructions(
           randomInt(this.instructions.min, this.instructions.max)
         ),

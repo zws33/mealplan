@@ -1,9 +1,8 @@
 import {Router} from 'express';
 import {ZodError} from 'zod';
-import {repository} from '../recipeRepository/postgresRepository';
 import {DatabaseError} from 'pg';
-
-import {RecipeSchema, RecipeTagSchema} from '../models/models';
+import {Recipe, RecipeInputSchema, RecipeSchema, RecipeTagSchema} from '../models/models';
+import {recipeService} from '../services/recipeService';
 
 export const recipesRouter = Router();
 
@@ -14,7 +13,7 @@ recipesRouter.get('/', async (req, res) => {
       tags: RecipeTagSchema.array().parse(tags),
       limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
     };
-    const recipes = await repository.findAllRecipes(query);
+    const recipes = await recipeService.findAllRecipes(query);
     if (!recipes) {
       res.status(404).send('Recipe not found');
       return;
@@ -35,8 +34,8 @@ recipesRouter.get('/', async (req, res) => {
 
 recipesRouter.post('/', async (req, res) => {
   try {
-    const recipe = RecipeSchema.omit({id: true}).parse(req.body);
-    const result = await repository.createRecipe(recipe);
+    const recipe = RecipeInputSchema.parse(req.body);
+    const result = await recipeService.createRecipe(recipe);
     res.json(result);
   } catch (error) {
     console.log(error);
@@ -48,7 +47,7 @@ recipesRouter.post('/', async (req, res) => {
 recipesRouter.get('/:id', async (req, res) => {
   const id = req.params.id;
   try {
-    const recipe = await repository.findRecipeById(parseInt(id));
+    const recipe = await recipeService.findRecipeById(parseInt(id));
     if (!recipe) {
       res.status(404).send('Recipe not found');
       return;

@@ -1,17 +1,33 @@
 import {
   Ingredient,
   IngredientInput,
+  Instruction,
   Recipe,
-  RecipeInput,
   RecipeRequestParams,
+  RecipeTag,
 } from '../models/models';
 
 export interface RecipeRepository {
-  createRecipe(recipeInput: RecipeInput): Promise<Recipe>;
+  createRecipe(
+    name: string,
+    quantifiedIngredients: {
+      ingredientId: number;
+      quantity: number;
+      unit: string;
+    }[],
+    instructions: Instruction[],
+    tags: RecipeTag[]
+  ): Promise<{id: number}>;
+
   findRecipeById(id: number): Promise<Recipe | undefined>;
+
   findAllRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]>;
-  updateRecipe(recipe: Recipe): Promise<Recipe>;
+
+  updateRecipe(recipe: Recipe): Promise<{id: number}>;
+
   deleteRecipe(id: number): Promise<boolean>;
-  createIngredient(ingredient: IngredientInput): Promise<Ingredient>;
-  findIngredientById(id: number): Promise<Ingredient>;
+
+  createIngredient(ingredient: IngredientInput): Promise<{id: number}>;
+
+  findIngredientById(id: number): Promise<Ingredient | undefined>;
 }

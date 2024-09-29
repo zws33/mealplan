@@ -1,9 +1,8 @@
 import {Router} from 'express';
-
-import {repository} from '../recipeRepository/postgresRepository';
 import {IngredientSchema} from '../models/models';
 import {DatabaseError} from 'pg';
 import {ZodError} from 'zod';
+import {recipeService} from '../services/recipeService';
 
 export const ingredientsRouter = Router();
 
@@ -11,7 +10,7 @@ ingredientsRouter.post('/', async (req, res) => {
   const inputSchema = IngredientSchema.omit({id: true});
   try {
     const ingredientInput = inputSchema.parse(req.body);
-    const result = await repository.createIngredient(ingredientInput);
+    const result = await recipeService.createIngredient(ingredientInput);
     res.status(200).json(result);
   } catch (error) {
     if (error instanceof ZodError) {
@@ -28,7 +27,7 @@ ingredientsRouter.post('/', async (req, res) => {
 ingredientsRouter.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const result = await repository.findIngredientById(id);
+    const result = await recipeService.findIngredientById(id);
     res.json(result);
   } catch (error) {
     if (error instanceof DatabaseError) {

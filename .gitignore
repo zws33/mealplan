@@ -1,3 +1,4 @@
 .env
 dev_recipes.json
 **/node_modules
+.idea/

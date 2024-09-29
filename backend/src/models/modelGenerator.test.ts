@@ -74,7 +74,7 @@ describe('ModelGenerator', () => {
     expect(recipe.id).toBeLessThanOrEqual(1000);
     expect(recipe.tags).toBeDefined();
     expect(recipe.name).toBeDefined();
-    expect(recipe.ingredients).toBeDefined();
+    expect(recipe.quantifiedIngredients).toBeDefined();
     expect(recipe.instructions).toBeDefined();
   });
 
@@ -88,7 +88,7 @@ describe('ModelGenerator', () => {
       expect(recipe).toBeDefined();
       expect(recipe.tags).toBeDefined();
       expect(recipe.name).toBeDefined();
-      expect(recipe.ingredients).toBeDefined();
+      expect(recipe.quantifiedIngredients).toBeDefined();
       expect(recipe.instructions).toBeDefined();
     });
   });

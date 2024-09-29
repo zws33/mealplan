@@ -6,11 +6,11 @@ export function calculateRecipeCalories(recipe: Recipe): number {
 }
 
 export function getShoppingList(recipe: Recipe): QuantifiedIngredient[] {
-  return recipe.ingredients;
+  return recipe.quantifiedIngredients;
 }
 
 export function getMacros(recipe: Recipe): Macros {
-  const macros = recipe.ingredients.map(getMacrosForIngredient);
+  const macros = recipe.quantifiedIngredients.map(getMacrosForIngredient);
   return macros.reduce((sum, current) => {
     return {
       fat: sum.fat + current.fat,
