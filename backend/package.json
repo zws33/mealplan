@@ -12,7 +12,8 @@
     "watch": "tsc -w",
     "codegen": "kysely-codegen --dialect postgres --numeric-parser=number --env-file ../.env --camel-case --out-file ./src/db/kysely-types.d.ts",
     "dev": "nodemon --config nodemon.json",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "script": "node -r ts-node/register --env-file=.env"
   },
   "engines": {
     "node": ">=14"
@@ -35,6 +36,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
