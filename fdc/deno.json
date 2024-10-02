@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "@std/csv": "jsr:@std/csv@^1.0.3",
+    "@std/fs": "jsr:@std/fs@^1.0.4",
+    "@std/path": "jsr:@std/path@^1.0.6"
+  }
+}
