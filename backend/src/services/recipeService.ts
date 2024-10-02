@@ -7,8 +7,12 @@ import {
 } from '../models/models';
 import {repository} from '../recipeRepository/postgresRepository';
 import {RecipeRepository} from '../recipeRepository/recipeRepository';
+import {fdcApi} from './fdcApi';
 
 export class RecipeService {
+  searchIngredients(query: string, pageNumber?: number, pageSize?: number) {
+    return fdcApi.search(query, {pageSize, pageNumber});
+  }
   constructor(private readonly recipeRepository: RecipeRepository) {}
 
   async findAllRecipes(queryParams: RecipeRequestParams): Promise<Recipe[]> {

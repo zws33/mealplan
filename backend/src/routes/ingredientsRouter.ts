@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {IngredientSchema} from '../models/models';
 import {DatabaseError} from 'pg';
-import {ZodError} from 'zod';
+import {z, ZodError} from 'zod';
 import {recipeService} from '../services/recipeService';
 
 export const ingredientsRouter = Router();
@@ -36,5 +36,16 @@ ingredientsRouter.get('/:id', async (req, res) => {
     } else {
       res.status(500).send('Internal server error');
     }
+  }
+});
+
+ingredientsRouter.get('/search', async (req, res) => {
+  try {
+    const query = z.string().parse(req.query.q);
+    const result = await recipeService.searchIngredients(query);
+    res.json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal server error');
   }
 });
