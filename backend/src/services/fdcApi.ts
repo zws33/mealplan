@@ -64,11 +64,3 @@ class FdcApi {
 }
 
 export const fdcApi = new FdcApi();
-fdcApi
-  .search('apple', {})
-  .then(foods => {
-    //
-  })
-  .catch(error => {
-    console.error(error);
-  });

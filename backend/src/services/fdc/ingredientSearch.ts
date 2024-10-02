@@ -114,13 +114,3 @@ async function searchFood(searchTerm: string): Promise<FoodSearchResult> {
     throw new Error('Failed to fetch food data');
   }
 }
-if (process.argv[2]) {
-  console.log('Searching for:', process.argv[2]);
-  searchFood(process.argv[2])
-    .then(results => {
-      console.log(results);
-    })
-    .catch(error => {
-      console.error(error);
-    });
-}

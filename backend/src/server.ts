@@ -21,7 +21,7 @@ export async function startServer() {
     res.send('Hello World!');
   });
 
-  await initializeDatabase();
+  // await initializeDatabase();
   installRoutes(app);
 
   const PORT = process.env.PORT || 3000;

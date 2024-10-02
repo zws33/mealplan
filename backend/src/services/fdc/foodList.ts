@@ -27,14 +27,6 @@ async function foodList() {
   }
 }
 
-foodList()
-  .then(results => {
-    console.log(results);
-  })
-  .catch(error => {
-    console.error(error);
-  });
-
 async function fetchFoodList(
   options: {
     dataType?: string[];

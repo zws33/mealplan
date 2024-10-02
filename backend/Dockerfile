@@ -1,17 +1,16 @@
-# backend/Dockerfile
-
-# Stage 1: Build the TypeScript code
+# Stage 1: Set up the TypeScript app with tsx
 FROM node:18-alpine AS builder
 WORKDIR /app
 
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
 
+# Copy all project files
 COPY . .
-RUN npm run build
 
-# Install nodemon globally
-RUN npm install -g nodemon
+# Install tsx globally
+RUN npm install -g tsx
 
 # Expose the application's port
 EXPOSE 3000
@@ -19,8 +18,5 @@ EXPOSE 3000
 # Set the environment variable file
 ENV NODE_ENV=development
 
-# Copy nodemon configuration
-COPY nodemon.json .
-
-# Run the app with Nodemon
-CMD ["nodemon", "-L", "--config", "nodemon.json"]
+# Run the app with tsx in watch mode
+CMD ["tsx", "watch", "src/index.ts"]

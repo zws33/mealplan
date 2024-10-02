@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {ZodError} from 'zod';
 import {DatabaseError} from 'pg';
-import {Recipe, RecipeInputSchema, RecipeSchema, RecipeTagSchema} from '../models/models';
+import {RecipeInputSchema, RecipeTagSchema} from '../models/models';
 import {recipeService} from '../services/recipeService';
 
 export const recipesRouter = Router();
