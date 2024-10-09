@@ -28,7 +28,8 @@ const argv = await yargs(hideBin(Bun.argv))
 let files: string[] = [];
 if (argv.dir) {
   files = readdirSync(argv.dir).map((file) => `${argv.dir}/${file}`);
-  console.log(`Processing files:\n${files.join('\n')}`);
+  console.log(`Importing data from:\n${files.join('\n')}`);
+  console.log(`\n---------------------------------\n`);
 } else if (argv.files) {
   files = argv.files as string[];
 } else {
@@ -43,9 +44,8 @@ try {
     const tableName = getTableName(filePath);
     console.log(`Processing file: ${filePath}, Table: ${tableName}`);
     await createTableFromCSV(client, filePath, tableName);
-    console.log(`Table created: ${tableName}`);
     await importCSV(client, filePath, tableName, argv.limit);
-    console.log(`Data imported for table: ${tableName}`);
+    console.log(`\n---------------------------------\n`);
   }
 } catch (error) {
   console.error('Error processing files:', error);

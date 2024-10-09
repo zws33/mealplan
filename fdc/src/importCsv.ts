@@ -27,8 +27,8 @@ export async function importCSV(
       VALUES (${placeholders})
     `;
 
-    for (let i = 0; i < limit && i < rows.length; i++) {
-      const row = rows[i];
+    let rowCount = 0;
+    for (const row of rows) {
       const values = columns.map((col) => {
         // Convert values to numbers where applicable, or keep them as strings/NULL
         const value = row[col];
@@ -38,10 +38,9 @@ export async function importCSV(
       });
 
       await client.query(queryText, values);
-      console.log(`Inserted row with ${columns[0]}: ${row[columns[0]]}`);
+      rowCount++;
     }
-
-    console.log('CSV file successfully processed.');
+    console.log(`Inserted ${rowCount} rows into table "${tableName}".`);
   } catch (error) {
     console.error('Error processing CSV file:', error);
   }
