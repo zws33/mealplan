@@ -4,6 +4,8 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import me.zwsmith.plugins.*
+import me.zwsmith.plugins.database.RecipeService
+import me.zwsmith.plugins.database.connectToDatabase
 import me.zwsmith.plugins.recipes.recipeRouter
 
 fun main() {
@@ -14,5 +16,8 @@ fun main() {
 fun Application.module() {
     configureMonitoring()
     configureSerialization()
-    recipeRouter()
+    val database = connectToDatabase()
+    val recipeService = RecipeService.create(database)
+    recipeRouter(recipeService)
 }
+
