@@ -16,6 +16,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+/**
+ * Service interface for managing recipes and their ingredients.
+ */
 interface RecipeService {
     suspend fun createIngredient(name: String): Result<Ingredient>
     suspend fun findIngredientById(id: Int): Result<Ingredient>
@@ -88,6 +91,14 @@ class RecipeServiceImpl(database: Database, private val logger: Logger) : Recipe
         }
     }
     
+    /**
+     * Creates a new recipe with the specified name, optional description, and a list of quantified ingredient inputs.
+     *
+     * @param name The name of the recipe to be created.
+     * @param description An optional description of the recipe.
+     * @param ingredientInputs A list of quantified ingredient inputs that will form part of the recipe.
+     * @return A [Result] containing the newly created [Recipe] if successful, or an error if the operation fails.
+     */
     override suspend fun createRecipe(
         name: String,
         description: String?,
@@ -131,6 +142,16 @@ class RecipeServiceImpl(database: Database, private val logger: Logger) : Recipe
         runCatching { RecipeDao.all().map { it.toRecipe() } }
     }
     
+    /**
+     * Updates the details of an existing recipe including its name, description,
+     * and ingredients, based on the specified recipe ID and update data.
+     *
+     * @param recipeId The ID of the recipe to be updated.
+     * @param recipeUpdate An instance of [RecipeUpdate] containing updated details
+     *        such as name, description, and a list of ingredients.
+     * @return A [Result] containing the updated [Recipe] if the update
+     *         operation is successful, or an error if it fails.
+     */
     override suspend fun updateRecipe(
         recipeId: Int,
         recipeUpdate: RecipeUpdate
@@ -158,6 +179,13 @@ class RecipeServiceImpl(database: Database, private val logger: Logger) : Recipe
         }
     }
     
+    /**
+     * Updates the ingredients associated with a specific recipe.
+     *
+     * @param recipeId The ID of the recipe to update.
+     * @param ingredients The list of quantified ingredients to update within the recipe.
+     * @return A [Result] containing the updated [Recipe] if successful, or an error if the operation fails.
+     */
     override suspend fun updateRecipeIngredients(
         recipeId: Int,
         ingredients: List<QuantifiedIngredient>
@@ -208,6 +236,14 @@ class RecipeServiceImpl(database: Database, private val logger: Logger) : Recipe
         newSuspendedTransaction(Dispatchers.IO) { block() }
 }
 
+/**
+ * Factory function to create an instance of [RecipeService].
+ *
+ * @param database The database connection to be used by the service for data operations.
+ * @param logger The logger used for logging events and activities in the service;
+ * defaults to a logger for the [RecipeService] class if not provided.
+ * @return An instance of [RecipeServiceImpl] configured with the provided database and logger.
+ */
 fun RecipeService(
     database: Database,
     logger: Logger = LoggerFactory.getLogger(RecipeService::class.java)
