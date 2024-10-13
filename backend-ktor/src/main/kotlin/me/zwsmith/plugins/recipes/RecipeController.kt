@@ -2,6 +2,7 @@ package me.zwsmith.plugins.recipes
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
+import io.ktor.server.application.log
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.delete
@@ -21,38 +22,59 @@ fun Application.recipeRouter(recipeService: RecipeService) {
     routing {
         post("/recipes") {
             val recipeInput = call.receive<RecipeInput>()
-            val recipe = recipeService.createRecipe(
+            val result = recipeService.createRecipe(
                 name = recipeInput.name,
                 description = recipeInput.description,
                 ingredientInputs = recipeInput.ingredients,
             )
-            call.respond(HttpStatusCode.Created, recipe)
+            result.onSuccess {
+                call.respond(HttpStatusCode.Created, it)
+            }.onFailure {
+                log.error(it.message)
+                call.respond(HttpStatusCode.InternalServerError)
+            }
         }
         get("/recipes/{id}") {
             val id = call.parameters["id"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val recipe = recipeService.findRecipeById(id)
-            if (recipe == null) {
-                call.respond(HttpStatusCode.NotFound)
-            } else {
-                call.respond(recipe)
+            val result = recipeService.findRecipeById(id)
+            result.onSuccess {
+                call.respond(result.getOrThrow())
+            }.onFailure {
+                when (it) {
+                    is IllegalArgumentException -> {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
+                    
+                    else -> {
+                        log.error(it.message)
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
+                }
             }
         }
         get("/recipes") {
-            val recipes = recipeService.findRecipes()
-            call.respond(HttpStatusCode.OK, recipes)
+            val result = recipeService.findRecipes()
+            result.onSuccess {
+                call.respond(HttpStatusCode.OK, result.getOrThrow())
+            }.onFailure {
+                log.error(it.message)
+                call.respond(HttpStatusCode.InternalServerError)
+            }
         }
         put("/recipes/{id}") {
             val id = call.parameters["id"]?.toInt() ?: return@put call.respond(HttpStatusCode.BadRequest)
             val recipeUpdate = call.receive<RecipeUpdate>()
-            try {
-                recipeService.updateRecipe(id, recipeUpdate)
+            val result = recipeService.updateRecipe(id, recipeUpdate)
+            result.onSuccess {
                 call.respond(HttpStatusCode.OK)
-            } catch (e: Exception) {
-                when (e) {
+            }.onFailure {
+                when (it) {
                     is IllegalArgumentException -> {
-                        call.respond(HttpStatusCode.BadRequest, message = e.message ?: "Error updating recipe")
+                        call.respond(HttpStatusCode.BadRequest, message = it.message ?: "Error updating recipe")
                     }
+                    
                     else -> {
+                        log.error(it.message)
                         call.respond(HttpStatusCode.InternalServerError, message = "Error updating recipe")
                     }
                 }
@@ -62,53 +84,91 @@ fun Application.recipeRouter(recipeService: RecipeService) {
         post("/recipes/{id}/ingredients") {
             val id = call.parameters["id"]?.toInt() ?: return@post call.respond(HttpStatusCode.BadRequest)
             val ingredients = call.receive<List<QuantifiedIngredient>>()
-            recipeService.updateRecipeIngredients(id, ingredients)
-            call.respond(HttpStatusCode.OK)
+            val result = recipeService.updateRecipeIngredients(id, ingredients)
+            result.onSuccess {
+                call.respond(HttpStatusCode.OK)
+            }.onFailure {
+                when (it) {
+                    is RecipeService.RecipeNotFoundError -> {
+                        call.respond(HttpStatusCode.NotFound, it.message ?: "Error updating recipe ingredients")
+                    }
+                    
+                    else -> {
+                        log.error(it.message)
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
+                }
+                call.respond(HttpStatusCode.NotFound)
+            }
         }
         delete("/recipes/{id}") {
             val id = call.parameters["id"]?.toInt() ?: return@delete call.respond(HttpStatusCode.BadRequest)
-            val result = recipeService.deleteRecipe(id)
-            if (result) {
-                call.respond(HttpStatusCode.OK)
-            } else {
-                call.respond(HttpStatusCode.NotFound)
-            }
+            recipeService.deleteRecipe(id)
+                .onSuccess {
+                    call.respond(HttpStatusCode.OK)
+                }.onFailure {
+                    call.respond(HttpStatusCode.NotFound)
+                }
         }
     }
     
     routing {
         post("/ingredients") {
             val ingredientInput = call.receive<IngredientInput>()
-            val ingredient = recipeService.createIngredient(ingredientInput.name)
-            call.respond(ingredient)
+            val result = recipeService.createIngredient(ingredientInput.name)
+            result.onSuccess {
+                call.respond(it)
+            }.onFailure {
+                log.error(it.message)
+                call.respond(HttpStatusCode.InternalServerError, it.message ?: "Error creating ingredient")
+            }
         }
         
         get("/ingredients/{id}") {
             val id = call.parameters["id"]?.toInt() ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val ingredient = recipeService.findIngredientById(id)
-            if (ingredient == null) {
-                call.respond(HttpStatusCode.NotFound)
-            } else {
-                call.respond(ingredient)
+            val result = recipeService.findIngredientById(id)
+            result.onSuccess {
+                call.respond(it)
+            }.onFailure {
+                when (it) {
+                    is IllegalArgumentException -> {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
+                    
+                    else -> {
+                        log.error(it.message)
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
+                }
             }
         }
         
         put("/ingredients/{id}") {
             val ingredient = call.receive<Ingredient>()
-            val updatedIngredient = recipeService.updateIngredient(ingredient)
-            if (updatedIngredient != null) {
-                call.respond(updatedIngredient)
-            } else {
+            val result = recipeService.updateIngredient(ingredient)
+            result.onSuccess {
+                call.respond(it)
+            }.onFailure {
+                log.error(it.message)
                 call.respond(HttpStatusCode.NotFound)
             }
         }
         
         delete("/ingredients/{id}") {
             val id = call.parameters["id"]?.toInt() ?: return@delete call.respond(HttpStatusCode.BadRequest)
-            if (recipeService.deleteIngredient(id)) {
+            recipeService.deleteIngredient(id).onSuccess {
                 call.respond(HttpStatusCode.OK)
-            } else {
-                call.respond(HttpStatusCode.ExpectationFailed)
+            }.onFailure {
+                when (it) {
+                    is IllegalArgumentException -> {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
+                    
+                    else -> {
+                        log.error(it.message)
+                        call.respond(HttpStatusCode.InternalServerError)
+                    }
+                }
             }
         }
     }
@@ -118,7 +178,7 @@ fun Application.recipeRouter(recipeService: RecipeService) {
             val recipeIds = call.receive<ShoppingListRequest>().recipeIds
             val recipes = recipeIds
                 .mapNotNull { recipeId ->
-                    recipeService.findRecipeById(recipeId)
+                    recipeService.findRecipeById(recipeId).getOrNull()
                 }
                 .asSequence()
                 .map {
