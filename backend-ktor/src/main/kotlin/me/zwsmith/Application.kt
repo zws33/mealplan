@@ -17,7 +17,7 @@ fun Application.module() {
     configureMonitoring()
     configureSerialization()
     val database = connectToDatabase()
-    val recipeService = RecipeService.create(database)
-    recipeRouter(recipeService)
+    val recipeService = RecipeService(database)
+    recipeRouter(recipeService, log)
 }
 

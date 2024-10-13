@@ -5,16 +5,47 @@ import kotlinx.serialization.Serializable
 import me.zwsmith.plugins.Ingredient
 import me.zwsmith.plugins.QuantifiedIngredient
 import me.zwsmith.plugins.Recipe
+import me.zwsmith.plugins.database.RecipeService.IngredientNotFoundError
+import me.zwsmith.plugins.database.RecipeService.RecipeNotFoundError
 import org.jetbrains.exposed.dao.id.CompositeID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class RecipeService(database: Database) {
-    val logger = LoggerFactory.getLogger(RecipeService::class.java)
+interface RecipeService {
+    suspend fun createIngredient(name: String): Result<Ingredient>
+    suspend fun findIngredientById(id: Int): Result<Ingredient>
+    suspend fun updateIngredient(updateData: Ingredient): Result<Ingredient>
+    suspend fun deleteIngredient(id: Int): Result<Unit>
+    suspend fun createRecipe(
+        name: String,
+        description: String?,
+        ingredientInputs: List<QuantifiedIngredientInput>
+    ): Result<Recipe>
+    
+    suspend fun findRecipeById(id: Int): Result<Recipe>
+    suspend fun findRecipes(): Result<List<Recipe>>
+    suspend fun updateRecipe(
+        recipeId: Int,
+        recipeUpdate: RecipeUpdate
+    ): Result<Recipe>
+    
+    suspend fun updateRecipeIngredients(
+        recipeId: Int,
+        ingredients: List<QuantifiedIngredient>
+    ): Result<Recipe>
+    
+    suspend fun deleteRecipe(id: Int): Result<Unit>
+    
+    class RecipeNotFoundError(id: Int) : IllegalArgumentException("Recipe not found for id: $id")
+    class IngredientNotFoundError(id: Int) : IllegalArgumentException("Ingredient not found for id: $id")
+}
+
+class RecipeServiceImpl(database: Database, private val logger: Logger) : RecipeService {
     
     init {
         transaction(database) {
@@ -22,7 +53,7 @@ class RecipeService(database: Database) {
         }
     }
     
-    suspend fun createIngredient(name: String): Result<Ingredient> = dbQuery {
+    override suspend fun createIngredient(name: String): Result<Ingredient> = dbQuery {
         runCatching {
             IngredientDao.new {
                 this.name = name
@@ -30,16 +61,14 @@ class RecipeService(database: Database) {
         }
     }
     
-    suspend fun findIngredientById(id: Int): Result<Ingredient> = dbQuery {
+    override suspend fun findIngredientById(id: Int): Result<Ingredient> = dbQuery {
         IngredientDao.findById(id)
             ?.toIngredient()
             ?.let { Result.success(it) }
-            ?: Result.failure(
-                IllegalArgumentException("Ingredient not found for id: $id")
-            )
+            ?: Result.failure(IngredientNotFoundError(id))
     }
     
-    suspend fun updateIngredient(updateData: Ingredient): Result<Ingredient> = dbQuery {
+    override suspend fun updateIngredient(updateData: Ingredient): Result<Ingredient> = dbQuery {
         val ingredient = IngredientDao.findById(updateData.id)
         if (ingredient != null) {
             ingredient.name = updateData.name
@@ -49,7 +78,7 @@ class RecipeService(database: Database) {
         }
     }
     
-    suspend fun deleteIngredient(id: Int) = dbQuery {
+    override suspend fun deleteIngredient(id: Int) = dbQuery {
         val ingredient = IngredientDao.findById(id)
         if (ingredient == null) {
             Result.failure(IngredientNotFoundError(id))
@@ -59,7 +88,7 @@ class RecipeService(database: Database) {
         }
     }
     
-    suspend fun createRecipe(
+    override suspend fun createRecipe(
         name: String,
         description: String?,
         ingredientInputs: List<QuantifiedIngredientInput>
@@ -70,12 +99,12 @@ class RecipeService(database: Database) {
                 this.description = description
             }
             
-            // Associate QuantifiedIngredients with the new Recipe
             ingredientInputs.forEach { input ->
                 val ingredient = IngredientDao
                     .find { Ingredients.name eq input.ingredient.name }
                     .singleOrNull()
                     ?: IngredientDao.new {
+                        logger.info("Ingredient ${input.ingredient.name} not found. Creating new ingredient.")
                         this.name = input.ingredient.name
                     }
                 QuantifiedIngredientDao.new {
@@ -89,7 +118,7 @@ class RecipeService(database: Database) {
         }
     }
     
-    suspend fun findRecipeById(id: Int): Result<Recipe> = dbQuery {
+    override suspend fun findRecipeById(id: Int): Result<Recipe> = dbQuery {
         val recipe = RecipeDao.findById(id)
         if (recipe == null) {
             Result.failure(RecipeNotFoundError(id))
@@ -98,11 +127,11 @@ class RecipeService(database: Database) {
         }
     }
     
-    suspend fun findRecipes(): Result<List<Recipe>> = dbQuery {
+    override suspend fun findRecipes(): Result<List<Recipe>> = dbQuery {
         runCatching { RecipeDao.all().map { it.toRecipe() } }
     }
     
-    suspend fun updateRecipe(
+    override suspend fun updateRecipe(
         recipeId: Int,
         recipeUpdate: RecipeUpdate
     ): Result<Recipe> {
@@ -129,17 +158,14 @@ class RecipeService(database: Database) {
         }
     }
     
-    class RecipeNotFoundError(id: Int) : IllegalArgumentException("Recipe not found for id: $id")
-    class IngredientNotFoundError(id: Int) : IllegalArgumentException("Ingredient not found for id: $id")
-    
-    suspend fun updateRecipeIngredients(
+    override suspend fun updateRecipeIngredients(
         recipeId: Int,
         ingredients: List<QuantifiedIngredient>
     ): Result<Recipe> = dbQuery {
         val recipeDao = RecipeDao.findById(recipeId)
         if (recipeDao == null) {
             rollback()
-            return@dbQuery Result.failure(IllegalArgumentException("Recipe update failed: Could not find recipe with id: $recipeId"))
+            return@dbQuery Result.failure(RecipeNotFoundError(recipeId))
         }
         ingredients.forEach { qi ->
             val id = CompositeID {
@@ -156,7 +182,7 @@ class RecipeService(database: Database) {
                 val ingredientDao = IngredientDao.findById(qi.ingredient.id)
                 if (ingredientDao == null) {
                     rollback()
-                    return@dbQuery Result.failure(IllegalArgumentException("Recipe update failed: Could not find ingredient with id: ${qi.ingredient.id}"))
+                    return@dbQuery Result.failure(IngredientNotFoundError(qi.ingredient.id))
                 }
                 QuantifiedIngredientDao.new {
                     amount = qi.amount
@@ -169,7 +195,7 @@ class RecipeService(database: Database) {
         return@dbQuery Result.success(recipeDao.toRecipe())
     }
     
-    suspend fun deleteRecipe(id: Int): Result<Unit> = dbQuery {
+    override suspend fun deleteRecipe(id: Int): Result<Unit> = dbQuery {
         val recipe = RecipeDao.findById(id)
         if (recipe == null) {
             Result.failure(RecipeNotFoundError(id))
@@ -180,11 +206,12 @@ class RecipeService(database: Database) {
     
     private suspend fun <T> dbQuery(block: suspend Transaction.() -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
-    
-    companion object {
-        fun create(database: Database) = RecipeService(database)
-    }
 }
+
+fun RecipeService(
+    database: Database,
+    logger: Logger = LoggerFactory.getLogger(RecipeService::class.java)
+) = RecipeServiceImpl(database, logger)
 
 @Serializable
 data class RecipeInput(
