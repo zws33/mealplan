@@ -14,7 +14,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 
 
 object Recipes : IntIdTable() {
-    val name = varchar("name", 255)
+    val name = varchar("name", 255).uniqueIndex()
     val description = text("description").nullable()
 }
 
