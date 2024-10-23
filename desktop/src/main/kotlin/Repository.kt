@@ -20,7 +20,7 @@ val client by lazy {
 class Repository(private val client: HttpClient) {
     suspend fun fetchRecipes(): List<Recipe> {
         // Fetch the data from the server
-        val response: HttpResponse = client.get("http://localhost:3000/recipes") {
+        val response: HttpResponse = client.get("https://zwsmith.me/recipes") {
             parameter("mealType", "lunch")
         }
         
