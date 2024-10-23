@@ -8,44 +8,19 @@
 import Foundation
 
 class Repository: ObservableObject {
-    @Published var recipes = [Recipe]()
-    @Published var error: String? = nil
-    var isError: Bool = false
+    let recipeApi: RecipesApi = RecipesApi()
     
-    init(recipes: [Recipe] = defaultRecipes) {
-        self.recipes = recipes
-    }
-    
-    func refreshRecipes() async {
-        let result = await RecipesApi().getRecipes()
-        DispatchQueue.main.async {
-            switch result {
-            case .success(let newRecipes):
-                self.recipes = newRecipes
-            case .failure(let error):
-                print(error)
-            }
-        }
+    func refreshRecipes() async -> Result<[Recipe], Error>{
+        return await recipeApi.getRecipes()
     }
     
     func addRecipe(
         name: String,
         description: String,
         ingredients: [QuantifiedIngredientData]
-    ) async {
-        let result = await RecipesApi().addRecipe(
-            name,
-            description,
-            ingredients)
-        DispatchQueue.main.async {
-            switch result {
-            case .success(let newRecipe):
-                self.recipes.append(newRecipe)
-            case .failure(let error):
-                self.error = error.localizedDescription
-                print(error)
-            }
-        }
+    ) async -> Result<Recipe, Error> {
+        let recipeData = RecipeData(name: name, description: description, ingredients: ingredients)
+        return await recipeApi.addRecipe(recipeData)
     }
     
     static let defaultRecipes: [Recipe] = [

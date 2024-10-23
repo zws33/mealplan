@@ -10,7 +10,7 @@ struct RecipesApi {
     private let baseUrl = "http://192.168.1.167:8080/"
     func getRecipes() async -> Result<[Recipe], Error> {
         guard let url = URL(string: baseUrl+"recipes") else {
-            return .failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"]))
+            return .failure(genericError(message:"Invalid URL"))
         }
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -18,24 +18,19 @@ struct RecipesApi {
         
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
-            // Decode the JSON data
             guard let recipes = try? JSONDecoder().decode([Recipe].self, from: data) else {
                 return .failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to decode recipes"]))
             }
-            
-            // Success case
             return .success(recipes)
             
         } catch {
-            // If any error occurs, return it as failure
             return .failure(error)
         }
     }
     
-    func addRecipe(_ name: String,_ description: String?,_ quantifiedIngredients: [QuantifiedIngredientData]) async -> Result<Recipe, Error> {
-        let recipeData = RecipeData(name: name, description: description, ingredients: quantifiedIngredients)
+    func addRecipe(_ recipeData: RecipeData) async -> Result<Recipe, Error> {
         guard let url = URL(string: baseUrl+"recipes") else {
-            return .failure(NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"]))
+            return .failure(genericError(message: "Invalid URL"))
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -47,7 +42,7 @@ struct RecipesApi {
             
             let (data, _) = try await URLSession.shared.data(for: request)
             guard let newRecipe = try? JSONDecoder().decode(Recipe.self, from: data) else {
-                let error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to decode new recipe"])
+                let error = genericError(message: "Failed to decode new recipe")
                 return .failure(error)
             }
 
@@ -58,6 +53,10 @@ struct RecipesApi {
             return .failure(error)
         }
     }
+}
+
+fileprivate func genericError(message: String) -> NSError {
+    return NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: message])
 }
 
 struct RecipeData : Codable{
@@ -75,25 +74,3 @@ struct QuantifiedIngredientData: Codable {
 struct IngredientData: Codable {
     let name: String
 }
-
-
-struct Ingredient: Codable, Identifiable, Hashable {
-    let id: Int
-    let name: String
-}
-
-// Define the structure for a QuantifiedIngredient
-struct QuantifiedIngredient: Codable, Hashable {
-    let ingredient: Ingredient
-    let amount: Double
-    let unit: String
-}
-
-// Define the structure for a Recipe
-struct Recipe: Codable, Identifiable, Hashable {
-    let id: Int
-    let name: String
-    let description: String
-    let quantifiedIngredients: [QuantifiedIngredient]
-}
-

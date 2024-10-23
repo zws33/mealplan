@@ -21,12 +21,11 @@ struct MainView : View {
     @EnvironmentObject var repository: Repository
     var body: some View {
         TabView {
-            RecipeList()
-                .environmentObject(repository)
+            RecipeList(viewModel: .init(repository: repository))
                 .tabItem {
                     Label("Recipes", systemImage: "list.bullet.rectangle")
                 }
-            RecipeForm()
+            RecipeForm(viewModel: .init(repository: repository))
                 .tabItem {
                     Label("Add Recipe", systemImage: "plus.circle.fill")
                 }

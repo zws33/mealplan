@@ -25,6 +25,5 @@ struct RecipeDetail: View {
 }
 
 #Preview {
-    
     RecipeDetail(recipe: Repository.defaultRecipes[0])
 }
