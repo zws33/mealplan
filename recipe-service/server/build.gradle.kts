@@ -24,6 +24,13 @@ repositories {
     mavenCentral()
 }
 
+ktor {
+    docker {
+        localImageName.set("zws33/mealplan-api")
+        imageTag.set("0.0.1-preview")
+    }
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-call-logging-jvm")
