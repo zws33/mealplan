@@ -22,10 +22,6 @@ fun RecipeItem(
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text("Recipe: ${recipe.name}")
-                val macros = recipe.getMacros()
-                Text("Protein: ${macros.protein}")
-                Text("Carbohydrates: ${macros.carbohydrate}")
-                Text("Fat: ${macros.fat}")
             }
         }
     }
